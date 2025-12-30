@@ -1,0 +1,8 @@
+# Ignorer les fichiers .pro et .pro.user
+*.pro*
+
+# Ignorer le dossier build
+build/
+
+# Ignorer le dossier .qtcreator
+.qtcreator/
