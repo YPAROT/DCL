@@ -16,8 +16,8 @@ public:
     QString defaultRequestForFullDCLTable();
     QString defaultRequestForBoardDCLTable();
 
-    bool setNameAndRequestForTableIndex(int tableIndex,QString newTableName,QString request);
-    bool addNewTable(QString tableName,QString request);
+    bool setNameAndRequestForTableIndex(int tableIndex, QString newTableName, QString request);
+    bool addNewTable(QString tableName, QString request);
 
     bool removeTableIndex(int tableIndex);
     bool loadConfFromFile(QString filename);

@@ -15,10 +15,10 @@ QT_FORWARD_DECLARE_CLASS(QSqlError)
 QT_FORWARD_DECLARE_CLASS(QTableWidgetItem)
 
 QT_BEGIN_NAMESPACE
-namespace Ui { class MainWindow; }
+namespace Ui {
+class MainWindow;
+}
 QT_END_NAMESPACE
-
-
 
 struct Etiquette_Data
 {
@@ -136,10 +136,9 @@ private:
     void refreshEditTables();
     QString splitRanges(QString ranges);
 
-    DCL_SQLManager* m_dclSQLManager;
+    DCL_SQLManager *m_dclSQLManager;
     QList<QStringList> m_csvData;
-    TableViewManager* m_tableViewManager;
+    TableViewManager *m_tableViewManager;
 };
-
 
 #endif // MAINWINDOW_H

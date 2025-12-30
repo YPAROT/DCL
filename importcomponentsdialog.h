@@ -14,7 +14,11 @@ class ImportComponentsDialog : public QDialog
 public:
     explicit ImportComponentsDialog(QWidget *parent = nullptr);
     ~ImportComponentsDialog();
-    int exec(QString tableName, QStringList tableHeaders, QStringList csvHeaders, QStringList statusList, QStringList procurementCompanyList);
+    int exec(QString tableName,
+             QStringList tableHeaders,
+             QStringList csvHeaders,
+             QStringList statusList,
+             QStringList procurementCompanyList);
     QString status();
     QString fournisseur();
     QList<QStringList> correspondances();

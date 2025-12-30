@@ -16,7 +16,11 @@ public:
     explicit EditTableDialog(QWidget *parent = nullptr);
     ~EditTableDialog();
 
-    int execute(QString tableName, QString requete, bool tableNameIsEditable, QString infoLabel, bool groupByRequest);
+    int execute(QString tableName,
+                QString requete,
+                bool tableNameIsEditable,
+                QString infoLabel,
+                bool groupByRequest);
     QString request();
     QString tableName();
 private slots:

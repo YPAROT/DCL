@@ -58,7 +58,7 @@ QT_FORWARD_DECLARE_CLASS(QTreeWidgetItem)
 QT_FORWARD_DECLARE_CLASS(QSqlDatabase)
 QT_FORWARD_DECLARE_CLASS(QMenu)
 
-class ConnectionWidget: public QWidget
+class ConnectionWidget : public QWidget
 {
     Q_OBJECT
 public:

@@ -1,12 +1,12 @@
 #include "qmysqltableview.h"
-#include <QtSql>
 #include <QHeaderView>
 #include <QScrollBar>
+#include <QtSql>
 
-FilterHeader::FilterHeader(Qt::Orientation orientation, QWidget *parent):
-    QHeaderView(orientation, parent),
-    _editors({}),
-    _padding(4)
+FilterHeader::FilterHeader(Qt::Orientation orientation, QWidget *parent)
+    : QHeaderView(orientation, parent)
+    , _editors({})
+    , _padding(4)
 {
     _timer = new QTimer(this);
 
@@ -20,23 +20,22 @@ FilterHeader::FilterHeader(Qt::Orientation orientation, QWidget *parent):
 
 void FilterHeader::setFilterBoxes(const int columnCount)
 {
-    QMap<int, QString> regexpColumns = static_cast<QMySqlTableView*>(parent())->getRegExpColumns();
-    for(int i(0); i < columnCount; ++i)
-    {
-        if(static_cast<QMySqlTableView*>(parent())->getExpcludeColumns().contains(i))
+    QMap<int, QString> regexpColumns = static_cast<QMySqlTableView *>(parent())->getRegExpColumns();
+    for (int i(0); i < columnCount; ++i) {
+        if (static_cast<QMySqlTableView *>(parent())->getExpcludeColumns().contains(i))
             break;
         QLineEdit *le = new QLineEdit(this);
         le->setPlaceholderText(QString("filtre"));
-        if(regexpColumns.contains(i))
+        if (regexpColumns.contains(i))
             le->setValidator(new QRegExpValidator(QRegExp(regexpColumns.value(i))));
 
         _editors.append(le);
-        connect(le, &QLineEdit::textChanged, [this, i](const QString text)
-        {
+        connect(le, &QLineEdit::textChanged, [this, i](const QString text) {
             _timer->setSingleShot(true);
             _timer->start(1000);
-            connect(_timer, &QTimer::timeout, [this, i, text](){
-                emit filterTViewTextChanged(i, text);});
+            connect(_timer, &QTimer::timeout, [this, i, text]() {
+                emit filterTViewTextChanged(i, text);
+            });
         });
     }
     adjustPositions();
@@ -45,8 +44,7 @@ void FilterHeader::setFilterBoxes(const int columnCount)
 QSize FilterHeader::sizeHint() const
 {
     QSize size = QHeaderView::sizeHint();
-    if(!_editors.isEmpty())
-    {
+    if (!_editors.isEmpty()) {
         const int height = _editors[0]->sizeHint().height();
         size.setHeight(size.height() + height + _padding);
     }
@@ -55,12 +53,10 @@ QSize FilterHeader::sizeHint() const
 
 void FilterHeader::updateGeometries()
 {
-    if(!_editors.isEmpty())
-    {
+    if (!_editors.isEmpty()) {
         const int height = _editors[0]->sizeHint().height();
         setViewportMargins(0, 0, 0, height + _padding);
-    }
-    else
+    } else
         setViewportMargins(0, 0, 0, 0);
     QHeaderView::updateGeometries();
     adjustPositions();
@@ -69,16 +65,16 @@ void FilterHeader::updateGeometries()
 void FilterHeader::adjustPositions()
 {
     int column = 0;
-    foreach(QLineEdit *le, _editors)
-    {
+    foreach (QLineEdit *le, _editors) {
         const int height = _editors[column]->sizeHint().height() - 2;
-        le->move(sectionPosition(column) - offset(), height + (_padding/5));
+        le->move(sectionPosition(column) - offset(), height + (_padding / 5));
         le->resize(sectionSize(column), height);
         ++column;
     }
 }
 
-QMySqlTableView::QMySqlTableView(QWidget *parent) : QTableView(parent)
+QMySqlTableView::QMySqlTableView(QWidget *parent)
+    : QTableView(parent)
 {
     _proxy = new QSortFilterProxyModel;
     _header = new FilterHeader(Qt::Horizontal, this);
@@ -87,30 +83,29 @@ QMySqlTableView::QMySqlTableView(QWidget *parent) : QTableView(parent)
     horizontalHeader()->setLayout(_filterLayout);
     horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeMode::ResizeToContents);
 
-    connect(_header, &FilterHeader::filterTViewTextChanged, this, &QMySqlTableView::filterTViewTextChanged);
+    connect(_header,
+            &FilterHeader::filterTViewTextChanged,
+            this,
+            &QMySqlTableView::filterTViewTextChanged);
 
-    m_insertRowAction = new QAction(tr("Ajouter une entrée..."),this);
+    m_insertRowAction = new QAction(tr("Ajouter une entrée..."), this);
     connect(m_insertRowAction, SIGNAL(triggered(bool)), this, SLOT(on_insertRowAction_triggered()));
 
-    m_deleteRowAction = new QAction(tr("Supprimer les lignes selectionnées..."),this);
+    m_deleteRowAction = new QAction(tr("Supprimer les lignes selectionnées..."), this);
     connect(m_deleteRowAction, SIGNAL(triggered(bool)), this, SLOT(on_deleteRowAction_triggered()));
 
     setEditable(true);
     setSortingEnabled(true);
-    verticalHeader()->setVisible(false);    
+    verticalHeader()->setVisible(false);
 }
-
 
 void QMySqlTableView::setEditable(bool editable)
 {
     m_isEditable = editable;
-    if (m_isEditable)
-    {
+    if (m_isEditable) {
         addAction(m_insertRowAction);
         addAction(m_deleteRowAction);
-    }
-    else
-    {
+    } else {
         removeAction(m_insertRowAction);
         removeAction(m_deleteRowAction);
     }
@@ -124,24 +119,21 @@ void QMySqlTableView::filterTViewTextChanged(const int column, const QString pat
     _proxy->setFilterFixedString(pattern);
 }
 
-
-
-void QMySqlTableView::createAction(QAction* action, QString label, const char *member)
+void QMySqlTableView::createAction(QAction *action, QString label, const char *member)
 {
     action = new QAction(label, this);
     action->setStatusTip(label);
     connect(action, SIGNAL(triggered(bool)), this, member);
 }
 
-
 void QMySqlTableView::updateActions()
 {
-    QSqlTableModel * tm = qobject_cast<QSqlTableModel *>(model());
+    QSqlTableModel *tm = qobject_cast<QSqlTableModel *>(model());
     bool enableIns = tm;
     bool enableDel = enableIns && currentIndex().isValid();
 
-//    m_insertRowAction->setEnabled(enableIns);
-//    m_deleteRowAction->setEnabled(enableDel);
+    //    m_insertRowAction->setEnabled(enableIns);
+    //    m_deleteRowAction->setEnabled(enableDel);
 }
 
 void QMySqlTableView::insertRow()
@@ -155,7 +147,7 @@ void QMySqlTableView::insertRow()
     if (!tableModel)
         return;
 
-    edit(tableModel->index(tableModel->rowCount()-1,qMin(tableModel->columnCount()-1,1)));
+    edit(tableModel->index(tableModel->rowCount() - 1, qMin(tableModel->columnCount() - 1, 1)));
     doItemsLayout(); // HACK
 }
 
@@ -191,7 +183,9 @@ QStringList QMySqlTableView::selectedRowsString(int columnIndex)
     return itemsStr;
 }
 
-void QMySqlTableView::showTable(const QString &tableName, QSqlDatabase db, QString defaultInsertQuery)
+void QMySqlTableView::showTable(const QString &tableName,
+                                QSqlDatabase db,
+                                QString defaultInsertQuery)
 {
     m_defaultInsertQuery = defaultInsertQuery;
     m_db = db;
@@ -211,9 +205,11 @@ void QMySqlTableView::refreshTable()
     setUpdatesEnabled(false);
     //   setModel(model);
 
-    setEditTriggers(QAbstractItemView::DoubleClicked|QAbstractItemView::EditKeyPressed);
-    connect(selectionModel(), &QItemSelectionModel::currentRowChanged,
-            this, &QMySqlTableView::updateActions);
+    setEditTriggers(QAbstractItemView::DoubleClicked | QAbstractItemView::EditKeyPressed);
+    connect(selectionModel(),
+            &QItemSelectionModel::currentRowChanged,
+            this,
+            &QMySqlTableView::updateActions);
 
     _proxy->setSourceModel(model);
     setModel(_proxy);
@@ -225,7 +221,6 @@ void QMySqlTableView::refreshTable()
     updateActions();
     doItemsLayout(); // HACK
 }
-
 
 void QMySqlTableView::execQuery(QString queryStr, QSqlDatabase db)
 {
@@ -239,8 +234,8 @@ void QMySqlTableView::execQuery(QString queryStr, QSqlDatabase db)
     else if (model->query().isSelect())
         emit statusMessage(tr("Query OK."));
     else
-        emit statusMessage(tr("Query OK, number of affected rows: %1").arg(
-                               model->query().numRowsAffected()));
+        emit statusMessage(
+            tr("Query OK, number of affected rows: %1").arg(model->query().numRowsAffected()));
 
     _proxy->setSourceModel(model);
     setModel(_proxy);
@@ -255,13 +250,11 @@ void QMySqlTableView::execQuery(QString queryStr, QSqlDatabase db)
 void QMySqlTableView::setHiddenColumns(QStringList hiddenColumnsNames)
 {
     QSqlQueryModel *model = new QSqlQueryModel(this);
-    for (int column = 0; column < model->columnCount();++column)
-    {
+    for (int column = 0; column < model->columnCount(); ++column) {
         QString headerName = model->headerData(column, Qt::Horizontal).toString();
-        setColumnHidden(column, (hiddenColumnsNames.indexOf(headerName) >=0));
+        setColumnHidden(column, (hiddenColumnsNames.indexOf(headerName) >= 0));
     }
 }
-
 
 void QMySqlTableView::setModel(QAbstractItemModel *model)
 {

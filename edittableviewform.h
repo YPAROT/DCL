@@ -16,7 +16,11 @@ class EditTableViewForm : public QWidget
 public:
     explicit EditTableViewForm(QWidget *parent = nullptr);
     ~EditTableViewForm();
-    void setTableViewManager(TableViewManager* tableViewManager) {m_tableViewManager = tableViewManager; updateTableView();}
+    void setTableViewManager(TableViewManager *tableViewManager)
+    {
+        m_tableViewManager = tableViewManager;
+        updateTableView();
+    }
 private slots:
     void on_addTablePushButton_clicked();
     void on_editTableViewTableWidget_cellDoubleClicked(int row, int column);
@@ -24,9 +28,10 @@ private slots:
 
 signals:
     void tableViewUpdated();
+
 private:
     Ui::EditTableViewForm *ui;
-    TableViewManager* m_tableViewManager;
+    TableViewManager *m_tableViewManager;
     QAction *m_deleteRowAction;
 
     void updateTableView();

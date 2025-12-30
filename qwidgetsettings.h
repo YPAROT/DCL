@@ -1,10 +1,10 @@
 #ifndef QWIDGETSETTINGS_H
 #define QWIDGETSETTINGS_H
 
-#include <QList>
-#include <QWidget>
 #include <QHash>
+#include <QList>
 #include <QSettings>
+#include <QWidget>
 //*************************************************************************
 //
 //  Sauvegarde et rechargement des parametres d'une fenetre
@@ -59,38 +59,60 @@ class QWidgetSettings : public QObject
 {
     Q_OBJECT
 public:
-    QWidgetSettings(){}
+    QWidgetSettings() {}
 
     enum AllInputsType {
-        DefaultInputsTypes              = 0x00000000,
-        DontMoveAndResizeParentWidget   = 0x00000001,
-        IncludeScrollBar                = 0x00000002,
-        IncludeTextAndPlainTextEdit     = 0x00000004,
-        DontIncludeToolAndPushButton    = 0x00000008,
-        IncludeSplitter                 = 0x00000010
+        DefaultInputsTypes = 0x00000000,
+        DontMoveAndResizeParentWidget = 0x00000001,
+        IncludeScrollBar = 0x00000002,
+        IncludeTextAndPlainTextEdit = 0x00000004,
+        DontIncludeToolAndPushButton = 0x00000008,
+        IncludeSplitter = 0x00000010
     };
 
     Q_DECLARE_FLAGS(AllInputsTypes, AllInputsType)
 
-    static QList<QWidget *> allInputsWidgets(QWidget *parent,AllInputsTypes types = DefaultInputsTypes,QList<QWidget*> excludedWidgets = QList<QWidget*>(),QList<QWidget*> includedWidgets = QList<QWidget*>());
+    static QList<QWidget *> allInputsWidgets(QWidget *parent,
+                                             AllInputsTypes types = DefaultInputsTypes,
+                                             QList<QWidget *> excludedWidgets = QList<QWidget *>(),
+                                             QList<QWidget *> includedWidgets = QList<QWidget *>());
 
-    static void loadAllInputsSettings(QWidget* parent, AllInputsTypes types = DefaultInputsTypes, QList<QWidget*> excludedWidgets = QList<QWidget*>(),QList<QWidget*> includedWidgets = QList<QWidget*>());
-    static void saveAllInputsSettings(QWidget* parent, AllInputsTypes types = DefaultInputsTypes, QList<QWidget*> excludedWidgets = QList<QWidget*>(),QList<QWidget*> includedWidgets = QList<QWidget*>());
+    static void loadAllInputsSettings(QWidget *parent,
+                                      AllInputsTypes types = DefaultInputsTypes,
+                                      QList<QWidget *> excludedWidgets = QList<QWidget *>(),
+                                      QList<QWidget *> includedWidgets = QList<QWidget *>());
+    static void saveAllInputsSettings(QWidget *parent,
+                                      AllInputsTypes types = DefaultInputsTypes,
+                                      QList<QWidget *> excludedWidgets = QList<QWidget *>(),
+                                      QList<QWidget *> includedWidgets = QList<QWidget *>());
 
-    static void loadInputsSettings(QWidget* parent, bool restoreParentWidgetSizeAndPos, QList<QWidget*> inputsWidgets);
-    static void saveInputsSettings(QWidget* parent, QList<QWidget*> inputsWidgets);
+    static void loadInputsSettings(QWidget *parent,
+                                   bool restoreParentWidgetSizeAndPos,
+                                   QList<QWidget *> inputsWidgets);
+    static void saveInputsSettings(QWidget *parent, QList<QWidget *> inputsWidgets);
 
-    static void loadAllInputsSettings(QWidget* parent,QString filename, AllInputsTypes types = DefaultInputsTypes, QList<QWidget*> excludedWidgets = QList<QWidget*>(),QList<QWidget*> includedWidgets = QList<QWidget*>());
-    static void saveAllInputsSettings(QWidget* parent,QString filename, AllInputsTypes types = DefaultInputsTypes, QList<QWidget*> excludedWidgets = QList<QWidget*>(),QList<QWidget*> includedWidgets = QList<QWidget*>());
+    static void loadAllInputsSettings(QWidget *parent,
+                                      QString filename,
+                                      AllInputsTypes types = DefaultInputsTypes,
+                                      QList<QWidget *> excludedWidgets = QList<QWidget *>(),
+                                      QList<QWidget *> includedWidgets = QList<QWidget *>());
+    static void saveAllInputsSettings(QWidget *parent,
+                                      QString filename,
+                                      AllInputsTypes types = DefaultInputsTypes,
+                                      QList<QWidget *> excludedWidgets = QList<QWidget *>(),
+                                      QList<QWidget *> includedWidgets = QList<QWidget *>());
 
-    static void loadInputsSettings(QWidget* parent,QString filename, bool restoreParentWidgetSizeAndPos, QList<QWidget*> inputsWidgets);
-    static void saveInputsSettings(QWidget* parent,QString filename, QList<QWidget*> inputsWidgets);
+    static void loadInputsSettings(QWidget *parent,
+                                   QString filename,
+                                   bool restoreParentWidgetSizeAndPos,
+                                   QList<QWidget *> inputsWidgets);
+    static void saveInputsSettings(QWidget *parent,
+                                   QString filename,
+                                   QList<QWidget *> inputsWidgets);
 
     static void setValue(const QString &key, const QVariant &value);
     static QVariant value(const QString &key, const QVariant &defaultValue = QVariant());
-    static QSettings* qSettings();
-
-
+    static QSettings *qSettings();
 };
 Q_DECLARE_OPERATORS_FOR_FLAGS(QWidgetSettings::AllInputsTypes)
 #endif // QWIDGETSETTINGS_H

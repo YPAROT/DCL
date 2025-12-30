@@ -4,7 +4,6 @@
 #include <QObject>
 #include <QSqlTableModel>
 
-
 class DCL_SQLManager
 {
 public:
@@ -19,9 +18,10 @@ public:
     QSqlDatabase currentDatabase() const;
     QStringList getListFromQuery(QString query);
     bool execQuery(QString queryStr);
-    QString lastError() { return m_lastError;}
+    QString lastError() { return m_lastError; }
     void close();
     bool saveAs(QString filename);
+
 private:
     int m_databasecounter;
 

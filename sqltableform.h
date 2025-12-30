@@ -1,13 +1,12 @@
 #ifndef SQLTABLEFORM_H
 #define SQLTABLEFORM_H
 
-#include <QWidget>
 #include <QLineEdit>
-#include <QTimer>
-#include <QSqlTableModel>
 #include <QSortFilterProxyModel>
+#include <QSqlTableModel>
 #include <QTableView>
-
+#include <QTimer>
+#include <QWidget>
 
 namespace Ui {
 class SQLTableForm;
@@ -25,10 +24,10 @@ public:
     void execQuery(QString queryStr, QSqlDatabase db);
     void showTable(const QString &t, QSqlDatabase db, QString defaultInsertQuery);
     QStringList selectedRowsString(int columnIndex);
-    QTableView* sqlTableView();
+    QTableView *sqlTableView();
     void setColumnHidden(int column, bool hide);
     void refreshTable(bool newTable = false);
-    QString tableName() {return m_tableName;}
+    QString tableName() { return m_tableName; }
 
 protected slots:
     void resultSectionResized(int logicalIndex, int oldSize, int newSize);
@@ -60,7 +59,7 @@ private:
     QAction *m_revertAction;
     QAction *m_resizeTableAction;
     bool m_isEditable;
-    QVector<QLineEdit*> m_lineEditors;
+    QVector<QLineEdit *> m_lineEditors;
     QTimer *m_lineEditorChangeTimer;
     QVector<QSortFilterProxyModel *> m_proxies;
 
@@ -69,13 +68,13 @@ private:
     QString m_tableName;
 };
 
-
-class CustomModel: public QSqlTableModel
+class CustomModel : public QSqlTableModel
 {
     Q_OBJECT
 public:
     explicit CustomModel(QObject *parent = nullptr, QSqlDatabase db = QSqlDatabase())
-        : QSqlTableModel(parent, db) {}
+        : QSqlTableModel(parent, db)
+    {}
 
     QVariant data(const QModelIndex &idx, int role) const override
     {

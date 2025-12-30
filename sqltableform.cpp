@@ -1,13 +1,12 @@
 #include "sqltableform.h"
-#include "ui_sqltableform.h"
-#include <QtSql>
-#include <QScrollBar>
 #include <QMessageBox>
+#include <QScrollBar>
+#include <QtSql>
+#include "ui_sqltableform.h"
 
-
-SQLTableForm::SQLTableForm(QWidget *parent) :
-    QWidget(parent),
-    ui(new Ui::SQLTableForm)
+SQLTableForm::SQLTableForm(QWidget *parent)
+    : QWidget(parent)
+    , ui(new Ui::SQLTableForm)
 {
     ui->setupUi(this);
 
@@ -20,30 +19,36 @@ SQLTableForm::SQLTableForm(QWidget *parent) :
     ui->headerTableWidget->horizontalScrollBar()->setVisible(false);
     ui->headerTableWidget->horizontalHeader()->setStretchLastSection(true);
     ui->headerTableWidget->verticalHeader()->setMaximumHeight(25);
-    m_insertRowAction = new QAction(tr("Ajouter une entrée..."),ui->sqlTableView);
+    m_insertRowAction = new QAction(tr("Ajouter une entrée..."), ui->sqlTableView);
     connect(m_insertRowAction, SIGNAL(triggered(bool)), this, SLOT(insertRow()));
 
-    m_deleteRowAction = new QAction(tr("Supprimer les lignes selectionnées..."),ui->sqlTableView);
+    m_deleteRowAction = new QAction(tr("Supprimer les lignes selectionnées..."), ui->sqlTableView);
     connect(m_deleteRowAction, SIGNAL(triggered(bool)), this, SLOT(deleteRow()));
 
-    m_commitAction = new QAction(tr("Commiter les changements..."),ui->sqlTableView);
+    m_commitAction = new QAction(tr("Commiter les changements..."), ui->sqlTableView);
     connect(m_commitAction, SIGNAL(triggered(bool)), this, SLOT(comitAll()));
 
-    m_revertAction = new QAction(tr("Annuler les changements..."),ui->sqlTableView);
+    m_revertAction = new QAction(tr("Annuler les changements..."), ui->sqlTableView);
     connect(m_revertAction, SIGNAL(triggered(bool)), this, SLOT(revertAll()));
 
-    m_resizeTableAction = new QAction(tr("Ajuster les lignes/colonnes au contenu..."),ui->sqlTableView);
+    m_resizeTableAction = new QAction(tr("Ajuster les lignes/colonnes au contenu..."),
+                                      ui->sqlTableView);
     connect(m_resizeTableAction, SIGNAL(triggered(bool)), this, SLOT(resizeTable()));
 
     setEditable(false);
     ui->sqlTableView->setSortingEnabled(true);
     ui->sqlTableView->horizontalHeader()->setStretchLastSection(true);
 
-    connect(m_lineEditorChangeTimer,SIGNAL(timeout()),this,SLOT(lineEditorChanged()));
-    connect(ui->sqlTableView->horizontalScrollBar(),SIGNAL(valueChanged(int)),ui->headerTableWidget->horizontalScrollBar(),SLOT(setValue(int)));
+    connect(m_lineEditorChangeTimer, SIGNAL(timeout()), this, SLOT(lineEditorChanged()));
+    connect(ui->sqlTableView->horizontalScrollBar(),
+            SIGNAL(valueChanged(int)),
+            ui->headerTableWidget->horizontalScrollBar(),
+            SLOT(setValue(int)));
 
-    connect(ui->headerTableWidget->horizontalHeader(),SIGNAL(sortIndicatorChanged(int,Qt::SortOrder))
-            ,this,SLOT(sortIndicatorChanged(int,Qt::SortOrder)));
+    connect(ui->headerTableWidget->horizontalHeader(),
+            SIGNAL(sortIndicatorChanged(int, Qt::SortOrder)),
+            this,
+            SLOT(sortIndicatorChanged(int, Qt::SortOrder)));
 }
 
 SQLTableForm::~SQLTableForm()
@@ -53,39 +58,42 @@ SQLTableForm::~SQLTableForm()
 
 void SQLTableForm::comitAll()
 {
-    if (m_sqlTableModel)
-    {
+    if (m_sqlTableModel) {
         if (m_sqlTableModel->submitAll() == false)
-            QMessageBox::warning(this,"Comit failure",m_sqlTableModel->lastError().text());
+            QMessageBox::warning(this, "Comit failure", m_sqlTableModel->lastError().text());
     }
 }
 
 void SQLTableForm::revertAll()
 {
-    if (m_sqlTableModel)
-    {
+    if (m_sqlTableModel) {
         m_sqlTableModel->revertAll();
     }
 }
 
 void SQLTableForm::resizeTable()
 {
-    disconnect(ui->headerTableWidget->horizontalHeader(),SIGNAL(sectionResized(int,int,int)),this,SLOT(resultSectionResized(int,int,int)));
+    disconnect(ui->headerTableWidget->horizontalHeader(),
+               SIGNAL(sectionResized(int, int, int)),
+               this,
+               SLOT(resultSectionResized(int, int, int)));
     ui->sqlTableView->resizeRowsToContents();
     ui->sqlTableView->resizeColumnsToContents();
     ui->sqlTableView->doItemsLayout(); // HACK
 
-    for (int i=0; i < ui->headerTableWidget->columnCount();i++)
-        ui->headerTableWidget->setColumnWidth(i,ui->sqlTableView->columnWidth(i));
+    for (int i = 0; i < ui->headerTableWidget->columnCount(); i++)
+        ui->headerTableWidget->setColumnWidth(i, ui->sqlTableView->columnWidth(i));
 
-    connect(ui->headerTableWidget->horizontalHeader(),SIGNAL(sectionResized(int,int,int)),this,SLOT(resultSectionResized(int,int,int)));
+    connect(ui->headerTableWidget->horizontalHeader(),
+            SIGNAL(sectionResized(int, int, int)),
+            this,
+            SLOT(resultSectionResized(int, int, int)));
 }
-
 
 void SQLTableForm::sortIndicatorChanged(int column, Qt::SortOrder order)
 {
     if (!m_proxies.isEmpty())
-        m_proxies.last()->sort(column,order);
+        m_proxies.last()->sort(column, order);
 }
 
 void SQLTableForm::resultSectionResized(int logicalIndex, int oldSize, int newSize)
@@ -93,22 +101,22 @@ void SQLTableForm::resultSectionResized(int logicalIndex, int oldSize, int newSi
     Q_UNUSED(logicalIndex)
     Q_UNUSED(oldSize)
     Q_UNUSED(newSize)
-    for (int i=0; i < ui->headerTableWidget->columnCount();i++)
-        ui->sqlTableView->setColumnWidth(i,ui->headerTableWidget->columnWidth(i));
+    for (int i = 0; i < ui->headerTableWidget->columnCount(); i++)
+        ui->sqlTableView->setColumnWidth(i, ui->headerTableWidget->columnWidth(i));
 }
-
 
 void SQLTableForm::updateHeaders()
 {
-
     if (ui->sqlTableView->model() && (ui->sqlTableView->model()->columnCount() == 0))
         return;
 
-    disconnect(ui->headerTableWidget->horizontalHeader(),SIGNAL(sectionResized(int,int,int)),this,SLOT(resultSectionResized(int,int,int)));
+    disconnect(ui->headerTableWidget->horizontalHeader(),
+               SIGNAL(sectionResized(int, int, int)),
+               this,
+               SLOT(resultSectionResized(int, int, int)));
 
     QStringList headers;
-    for(int i = 0; i < ui->sqlTableView->model()->columnCount(); i++)
-    {
+    for (int i = 0; i < ui->sqlTableView->model()->columnCount(); i++) {
         headers.append(ui->sqlTableView->model()->headerData(i, Qt::Horizontal).toString());
     }
 
@@ -125,13 +133,12 @@ void SQLTableForm::updateHeaders()
 
     m_lineEditors.clear();
     m_proxies.clear();
-    for (int i=0; i < headers.count();++i)
-    {
+    for (int i = 0; i < headers.count(); ++i) {
         QLineEdit *lineEditor = new QLineEdit(this);
         lineEditor->setPlaceholderText(QString("filtre"));
         m_lineEditors.append(lineEditor);
-        connect(lineEditor, SIGNAL(textChanged(QString)),this,SLOT(lineEditorJustChanged()));
-        ui->headerTableWidget->setCellWidget(0,i,lineEditor);
+        connect(lineEditor, SIGNAL(textChanged(QString)), this, SLOT(lineEditorJustChanged()));
+        ui->headerTableWidget->setCellWidget(0, i, lineEditor);
 
         QSortFilterProxyModel *proxy = new QSortFilterProxyModel;
         proxy->setFilterKeyColumn(i);
@@ -147,19 +154,21 @@ void SQLTableForm::updateHeaders()
         ui->sqlTableView->setModel(m_proxies.last());
 
     int height = ui->headerTableWidget->horizontalHeader()->height()
-            + ui->headerTableWidget->rowHeight(0)+4;
+                 + ui->headerTableWidget->rowHeight(0) + 4;
 
     ui->headerTableWidget->setMaximumHeight(height);
-    for (int i=0; i < ui->headerTableWidget->columnCount();i++)
-        ui->headerTableWidget->setColumnWidth(i,ui->sqlTableView->columnWidth(i));
+    for (int i = 0; i < ui->headerTableWidget->columnCount(); i++)
+        ui->headerTableWidget->setColumnWidth(i, ui->sqlTableView->columnWidth(i));
 
-    connect(ui->headerTableWidget->horizontalHeader(),SIGNAL(sectionResized(int,int,int)),this,SLOT(resultSectionResized(int,int,int)));
+    connect(ui->headerTableWidget->horizontalHeader(),
+            SIGNAL(sectionResized(int, int, int)),
+            this,
+            SLOT(resultSectionResized(int, int, int)));
 }
 
-void SQLTableForm::setColumnHidden(int column,bool hide)
+void SQLTableForm::setColumnHidden(int column, bool hide)
 {
-    if (column < ui->headerTableWidget->columnCount())
-    {
+    if (column < ui->headerTableWidget->columnCount()) {
         ui->headerTableWidget->setColumnHidden(column, hide);
         ui->sqlTableView->setColumnHidden(column, hide);
     }
@@ -173,8 +182,7 @@ void SQLTableForm::lineEditorChanged()
 {
     m_lineEditorChangeTimer->stop();
     // filter here
-    for (int i=0; i < m_lineEditors.count();++i)
-    {
+    for (int i = 0; i < m_lineEditors.count(); ++i) {
         m_proxies.at(i)->setFilterFixedString(m_lineEditors.at(i)->text());
     }
 }
@@ -182,33 +190,30 @@ void SQLTableForm::lineEditorChanged()
 void SQLTableForm::setEditable(bool editable)
 {
     m_isEditable = editable;
-    if (m_isEditable)
-    {
+    if (m_isEditable) {
         ui->sqlTableView->addAction(m_insertRowAction);
         ui->sqlTableView->addAction(m_deleteRowAction);
         ui->sqlTableView->addAction(m_commitAction);
         ui->sqlTableView->addAction(m_revertAction);
-    }
-    else
-    {
+    } else {
         ui->sqlTableView->removeAction(m_insertRowAction);
         ui->sqlTableView->removeAction(m_deleteRowAction);
         ui->sqlTableView->removeAction(m_commitAction);
         ui->sqlTableView->removeAction(m_revertAction);
     }
     ui->sqlTableView->addAction(m_resizeTableAction);
-
 }
 
 void SQLTableForm::insertRow()
-{    
+{
     if (!m_sqlTableModel)
         return;
-    QSqlQuery query (m_defaultInsertQuery,m_db);
+    QSqlQuery query(m_defaultInsertQuery, m_db);
     refreshTable();
 
-    ui->sqlTableView->setCurrentIndex(ui->sqlTableView->model()->index(m_sqlTableModel->rowCount()-1, 1));
-    ui->sqlTableView->edit(ui->sqlTableView->model()->index(m_sqlTableModel->rowCount()-1, 1));
+    ui->sqlTableView->setCurrentIndex(
+        ui->sqlTableView->model()->index(m_sqlTableModel->rowCount() - 1, 1));
+    ui->sqlTableView->edit(ui->sqlTableView->model()->index(m_sqlTableModel->rowCount() - 1, 1));
 }
 
 void SQLTableForm::deleteRow()
@@ -259,15 +264,13 @@ void SQLTableForm::refreshTable(bool newTable)
     if (m_sqlTableModel->lastError().type() != QSqlError::NoError)
         emit statusMessage(m_sqlTableModel->lastError().text());
 
-    if (newTable)
-    {
-        ui->sqlTableView->setEditTriggers(QAbstractItemView::DoubleClicked|QAbstractItemView::EditKeyPressed);
+    if (newTable) {
+        ui->sqlTableView->setEditTriggers(QAbstractItemView::DoubleClicked
+                                          | QAbstractItemView::EditKeyPressed);
         ui->sqlTableView->setModel(m_sqlTableModel);
         setEditable(true);
         updateHeaders();
-    }
-    else
-    {
+    } else {
         if (m_proxies.count())
             m_proxies.first()->setSourceModel(m_sqlTableModel);
     }
@@ -275,7 +278,7 @@ void SQLTableForm::refreshTable(bool newTable)
     ui->sqlTableView->setUpdatesEnabled(true);
 }
 
-QTableView* SQLTableForm::sqlTableView()
+QTableView *SQLTableForm::sqlTableView()
 {
     return ui->sqlTableView;
 }
@@ -292,8 +295,8 @@ void SQLTableForm::execQuery(QString queryStr, QSqlDatabase db)
     else if (model->query().isSelect())
         emit statusMessage(tr("Query OK."));
     else
-        emit statusMessage(tr("Query OK, number of affected rows: %1").arg(
-                               model->query().numRowsAffected()));
+        emit statusMessage(
+            tr("Query OK, number of affected rows: %1").arg(model->query().numRowsAffected()));
 
     ui->sqlTableView->setModel(model);
     ui->sqlTableView->setUpdatesEnabled(true);
@@ -301,7 +304,6 @@ void SQLTableForm::execQuery(QString queryStr, QSqlDatabase db)
 
     updateHeaders();
 }
-
 
 void SQLTableForm::on_sqlTableView_doubleClicked(const QModelIndex &index)
 {

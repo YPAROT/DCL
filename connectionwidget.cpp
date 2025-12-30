@@ -50,8 +50,8 @@
 
 #include "connectionwidget.h"
 
-#include <QtWidgets>
 #include <QtSql>
+#include <QtWidgets>
 
 ConnectionWidget::ConnectionWidget(QWidget *parent)
     : QWidget(parent)
@@ -74,9 +74,7 @@ ConnectionWidget::ConnectionWidget(QWidget *parent)
     QMetaObject::connectSlotsByName(this);
 }
 
-ConnectionWidget::~ConnectionWidget()
-{
-}
+ConnectionWidget::~ConnectionWidget() {}
 
 static QString qDBCaption(const QSqlDatabase &db)
 {
@@ -170,4 +168,3 @@ void ConnectionWidget::on_tree_currentItemChanged(QTreeWidgetItem *current, QTre
 {
     metaDataAction->setEnabled(current && current->parent());
 }
-

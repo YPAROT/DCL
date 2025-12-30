@@ -1,15 +1,15 @@
 #ifndef QMYSQLTABLEVIEW_H
 #define QMYSQLTABLEVIEW_H
 
-#include <QObject>
-#include <QTableView>
 #include <QAction>
-#include <QSqlTableModel>
 #include <QHBoxLayout>
-#include <QTableWidget>
-#include <QLineEdit>
 #include <QHeaderView>
+#include <QLineEdit>
+#include <QObject>
 #include <QSortFilterProxyModel>
+#include <QSqlTableModel>
+#include <QTableView>
+#include <QTableWidget>
 
 class FilterHeader : public QHeaderView
 {
@@ -19,24 +19,22 @@ public:
 
     void setFilterBoxes(const int columnCount);
 
-    QSize sizeHint() const          Q_DECL_OVERRIDE;
+    QSize sizeHint() const Q_DECL_OVERRIDE;
 
 protected:
-    void updateGeometries()         Q_DECL_OVERRIDE;
+    void updateGeometries() Q_DECL_OVERRIDE;
 
 private:
     void adjustPositions();
 
 private:
-    QVector<QLineEdit*> _editors;
+    QVector<QLineEdit *> _editors;
     int _padding;
     QTimer *_timer;
 
 signals:
     void filterTViewTextChanged(const int column, const QString text);
 };
-
-
 
 class QMySqlTableView : public QTableView
 {
@@ -54,8 +52,8 @@ public:
     void setRegExpForColumn(QMap<int, QString> regexpColumns);
     void setEditColumns(QVector<int> editColumns);
 
-    QMap<int, QString>  getRegExpColumns();
-    QVector<int>        getExpcludeColumns();
+    QMap<int, QString> getRegExpColumns();
+    QVector<int> getExpcludeColumns();
 
     void setModel(QAbstractItemModel *model) Q_DECL_OVERRIDE;
 
@@ -63,19 +61,14 @@ public:
     void setGetRegEpColumns(QMap<int, QString> *value);
 
 protected:
-
-
-
 private slots:
-    void on_insertRowAction_triggered()
-    { insertRow(); }
-    void on_deleteRowAction_triggered()
-    { deleteRow(); }
+    void on_insertRowAction_triggered() { insertRow(); }
+    void on_deleteRowAction_triggered() { deleteRow(); }
     void filterTViewTextChanged(const int column, const QString pattern);
-
 
 signals:
     void statusMessage(const QString &message);
+
 private:
     QAction *m_insertRowAction;
     QAction *m_deleteRowAction;
@@ -85,7 +78,7 @@ private:
     QSqlDatabase m_db;
     QString m_tableName;
 
-    void createAction(QAction* action, QString label, const char *member);
+    void createAction(QAction *action, QString label, const char *member);
     void refreshTable();
     void setHiddenColumns(QStringList hiddenColumnsNames);
 
@@ -94,15 +87,16 @@ private:
     QMap<int, QString> _regExpColumns;
     QVector<int> _expcludeColumns;
     FilterHeader *_header;
-    QSortFilterProxyModel * _proxy;
+    QSortFilterProxyModel *_proxy;
 };
 
-class CustomModel: public QSqlTableModel
+class CustomModel : public QSqlTableModel
 {
     Q_OBJECT
 public:
     explicit CustomModel(QObject *parent = nullptr, QSqlDatabase db = QSqlDatabase())
-        : QSqlTableModel(parent, db) {}
+        : QSqlTableModel(parent, db)
+    {}
 
     QVariant data(const QModelIndex &idx, int role) const override
     {
