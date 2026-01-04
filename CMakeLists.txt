@@ -3,6 +3,7 @@ project(GenericDCL VERSION 1.0 LANGUAGES C CXX)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOUIC ON)
+set(CMAKE_AUTORCC ON)
 
 find_package(Qt6 REQUIRED COMPONENTS Gui PrintSupport Sql Widgets)
 
@@ -38,6 +39,7 @@ qt_add_executable(GenericDCL WIN32 MACOSX_BUNDLE
     qwidgetsettings.cpp qwidgetsettings.h
     sqltableform.cpp sqltableform.h sqltableform.ui
     tableviewmanager.cpp tableviewmanager.h
+    qressources.qrc
 )
 
 target_compile_definitions(GenericDCL PRIVATE
@@ -59,43 +61,6 @@ target_link_libraries(GenericDCL PRIVATE
 # Lier la bibliothèque qtcsv
 target_link_libraries(GenericDCL PRIVATE "${QTCSV_LIBRARY}")
 
-# Resources:
-set(qressources_resource_files
-    "createTables.sql"
-)
-
-qt_add_resources(GenericDCL "qressources"
-    PREFIX
-        "/files"
-    FILES
-        ${qressources_resource_files}
-)
-set(qressources1_resource_files
-    "Edit Clear.png"
-    "File export.png"
-    "File import.png"
-    "File new.png"
-    "Help.png"
-    "SaveAs.png"
-    "close.png"
-    "dclManager.png"
-    "etiquettes.png"
-    "export2csv.png"
-    "logbook.png"
-    "open.png"
-    "refresh.png"
-    "save2.png"
-    "settings.png"
-    "sql.png"
-    "trash.png"
-)
-
-qt_add_resources(GenericDCL "qressources1"
-    PREFIX
-        "/images"
-    FILES
-        ${qressources1_resource_files}
-)
 
 install(TARGETS GenericDCL
     BUNDLE DESTINATION .
