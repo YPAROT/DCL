@@ -23,10 +23,10 @@ public:
     bool saveAs(QString filename);
 
 private:
-    int m_databasecounter;
+    //int m_databasecounter;
 
     QString m_filename;
-    QSqlDatabase m_db;
+    //QSqlDatabase m_db;
     QString m_lastError;
 };
 

@@ -6,25 +6,26 @@
 
 DCL_SQLManager::DCL_SQLManager()
 {
-    m_databasecounter = 0;
 }
 
 QSqlError DCL_SQLManager::newDCL(QString filename)
 {
     QSqlError err;
-
+    QSqlDatabase db = QSqlDatabase::database(); //utilisation de la connexion par défaut
     if (!filename.isEmpty()) {
-        if (m_db.isOpen())
-            m_db.close();
 
         err = openDB(filename);
         if (err.type() == QSqlError::NoError) {
             QFile file(":/files/createTables.sql");
-            file.open(QIODevice::ReadOnly | QIODevice::Text);
+            if(!file.open(QIODevice::ReadOnly | QIODevice::Text))
+            {
+                qWarning()<<"Erreur d'ouverture du fichier de configuration SQL";
+                return err;
+            }
             QTextStream in(&file);
             QString fileContent = in.readAll();
             file.close();
-            QSqlQuery query("", m_db);
+            QSqlQuery query("", db);
             QStringList queries = fileContent.split(";", Qt::SkipEmptyParts);
             for (int i = 0; i < queries.count(); ++i) {
                 if (!query.exec(queries.at(i) + ";")) {
@@ -45,7 +46,8 @@ bool DCL_SQLManager::saveAs(QString filename)
 {
     if (m_filename.isEmpty())
         return false;
-    if (m_db.isOpen()) {
+    QSqlDatabase db = QSqlDatabase::database(); //utilisation de la connexion par défaut
+    if (db.isOpen()) {
         close();
         if (QFile::exists(filename)) {
             if (QFile::remove(filename) == false) {
@@ -57,7 +59,7 @@ bool DCL_SQLManager::saveAs(QString filename)
         if (QFile::copy(m_filename, filename)) {
             QFile::remove(m_filename);
             openDB(filename);
-            return m_db.isOpen();
+            return db.isOpen();
         } else {
             openDB(m_filename);
             return false;
@@ -68,14 +70,19 @@ bool DCL_SQLManager::saveAs(QString filename)
 
 QSqlError DCL_SQLManager::openDB(QString filename)
 {
-    QSqlError err;
-    m_db = QSqlDatabase::addDatabase("QSQLITE", QString("DCL%1").arg(++m_databasecounter));
-    m_db.setDatabaseName(filename);
+    //La base de donnée est une Base SQLITE.
+    //Si on la ferme elle passe sur une base en mémoire
+    //Cela fait que db.isOpen() renvoie toujours true tant que la connexion existe
 
-    if (!m_db.open()) {
-        err = m_db.lastError();
-        m_db = QSqlDatabase();
-        QSqlDatabase::removeDatabase(QString("DCL%1").arg(m_databasecounter));
+    QSqlError err;
+    //m_db = QSqlDatabase::addDatabase("QSQLITE", QString("DCL%1").arg(++m_databasecounter));
+    QSqlDatabase db = QSqlDatabase::database(); //utilisation de la connexion par défaut
+    db.setDatabaseName(filename);
+
+    if (!db.open()) {
+        err = db.lastError();
+        //m_db = QSqlDatabase();
+        //QSqlDatabase::removeDatabase(QString("DCL%1").arg(m_databasecounter));
     } else {
         m_filename = filename;
         QFileInfo fileInfo(filename);
@@ -95,8 +102,9 @@ QSqlError DCL_SQLManager::openDB(QString filename)
 QStringList DCL_SQLManager::getListFromQuery(QString queryStr)
 {
     QStringList list;
-    if (m_db.isOpen()) {
-        QSqlQuery query("", m_db);
+    QSqlDatabase db = QSqlDatabase::database(); //utilisation de la connexion par défaut
+    if (db.isOpen()) {
+        QSqlQuery query("", db);
         if (!query.exec(queryStr)) {
             m_lastError = query.lastError().text();
             qWarning() << "ERREUR: " << query.lastError().text() << query.lastQuery();
@@ -114,9 +122,10 @@ QStringList DCL_SQLManager::getListFromQuery(QString queryStr)
 
 QStringList DCL_SQLManager::execQueryAndGetResult(QString queryStr)
 {
+    QSqlDatabase db = QSqlDatabase::database(); //utilisation de la connexion par défaut
     QStringList list;
-    if (m_db.isOpen()) {
-        QSqlQuery query("", m_db);
+    if (db.isOpen()) {
+        QSqlQuery query("", db);
         if (!query.exec(queryStr)) {
             m_lastError = query.lastError().text();
             qWarning() << "ERREUR: " << query.lastError().text() << query.lastQuery();
@@ -145,8 +154,9 @@ QStringList DCL_SQLManager::execQueryAndGetResult(QString queryStr)
 
 bool DCL_SQLManager::execQuery(QString queryStr)
 {
-    if (m_db.isOpen()) {
-        QSqlQuery query("", m_db);
+    QSqlDatabase db = QSqlDatabase::database(); //utilisation de la connexion par défaut
+    if (db.isOpen()) {
+        QSqlQuery query("", db);
 
         if (!query.exec(queryStr)) {
             m_lastError = query.lastError().text();
@@ -163,13 +173,14 @@ bool DCL_SQLManager::execQuery(QString queryStr)
 
 void DCL_SQLManager::close()
 {
-    m_db.commit();
-    m_db.close();
+    QSqlDatabase db = QSqlDatabase::database(); //utilisation de la connexion par défaut
+    db.commit();
+    db.close();
 }
 
 QSqlDatabase DCL_SQLManager::currentDatabase() const
 {
-    return m_db;
+    return QSqlDatabase::database(); //utilisation de la connexion par défaut;
 }
 
 QStringList DCL_SQLManager::getBoardList()
