@@ -2,6 +2,8 @@
 #include "ui_mainwindow.h"
 #include <QFileDialog>
 #include "datedelegate.h"
+#include "foreignkeydelegate.h"
+#include "ouinondelegate.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -74,8 +76,15 @@ void MainWindow::on_actionLoad_DCL_triggered()
     //Création des modèles via la factory
     m_factory->createModel("Composants",db);
     m_factory->attachView("Composants",ui->vue_edition_composant);
-    m_factory->setRelation("Composants",9,QSqlRelation("Manufacturer","Manuf_ID","Name"));
-    m_factory->setDelegate("Composants",20,new DateDelegate());
+    //m_factory->setRelation("Composants",9,QSqlRelation("Manufacturer","Manuf_ID","Name"));
+    m_factory->setDelegate("Composants",9,new ForeignKeyDelegate(this,"Manufacturer","Name","Manuf_ID",db));
+    m_factory->setDelegate("Composants",13,new OuiNonDelegate(this));
+    m_factory->setDelegate("Composants",14,new ForeignKeyDelegate(this,"Procurement Company","Name","Proc_ID",db));
+    m_factory->setDelegate("Composants",15,new OuiNonDelegate(this));
+    m_factory->setDelegate("Composants",17,new OuiNonDelegate(this));
+    m_factory->setDelegate("Composants",19,new ForeignKeyDelegate(this,"Status","Status","ID",db));
+    m_factory->setDelegate("Composants",20,new DateDelegate(this));
+    m_factory->setDelegate("Composants",22,new ForeignKeyDelegate(this,"Stockage","Location","ID",db));
 
     //select sur toutes les tables contenues dans la factory
     m_factory->selectOnAllModels();

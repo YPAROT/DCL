@@ -43,6 +43,8 @@ qt_add_executable(GenericDCL WIN32 MACOSX_BUNDLE
     componenttablemodel.h componenttablemodel.cpp
     tablemodelfactory.h tablemodelfactory.cpp
     datedelegate.h datedelegate.cpp
+    foreignkeydelegate.h foreignkeydelegate.cpp
+    ouinondelegate.h ouinondelegate.cpp
 )
 
 target_compile_definitions(GenericDCL PRIVATE

@@ -2,8 +2,8 @@
 #include <QDateEdit>
 #include <QCalendarWidget>
 #include <QPainter>
-#include <QApplication>
-#include <QSqlTableModel>
+//#include <QApplication>
+#include <QSqlRelationalTableModel>
 
 DateDelegate::DateDelegate(QObject* parent)
     : QStyledItemDelegate(parent)
@@ -42,10 +42,10 @@ void DateDelegate::paint(QPainter* painter, const QStyleOptionViewItem& option, 
     QString date = index.data(Qt::DisplayRole).toString();
 
     //gestion du background role
-    const QSqlTableModel* model = dynamic_cast<const QSqlTableModel*>(index.model());
+    const QSqlRelationalTableModel* model = dynamic_cast<const QSqlRelationalTableModel*>(index.model());
     if (model && model->isDirty(index)) {
         painter->fillRect(opt.rect, Qt::yellow);
     }
 
-    painter->drawText(opt.rect, date);
+    painter->drawText(opt.rect, date,opt.displayAlignment);
 }
