@@ -62,6 +62,12 @@ void TableModelFactory::clearAllModels()
         }
     }
 
+    // Supprime tous les délégués
+    for (auto &delegateMap : m_delegates) {
+        qDeleteAll(delegateMap);
+    }
+    m_delegates.clear();
+
     // Supprime tous les modèles
     qDeleteAll(m_models);
     m_models.clear();
@@ -75,6 +81,11 @@ void TableModelFactory::clearModel(const QString &tableName)
             view->setModel(nullptr);
         }
         m_views.remove(tableName);
+    }
+
+    if (m_delegates.contains(tableName)) {
+        qDeleteAll(m_delegates[tableName]);
+        m_delegates.remove(tableName);
     }
 
     if (m_models.contains(tableName)) {
@@ -100,6 +111,35 @@ bool TableModelFactory::selectOnModel(const QString &tableName)
         return m_models[tableName]->select();
     }
     return false;
+}
+
+void TableModelFactory::setDelegate(const QString &tableName, int column, QStyledItemDelegate *delegate)
+{
+    if (!m_models.contains(tableName)) {
+        qWarning() << "Modèle non trouvé pour la table" << tableName;
+        return;
+    }
+
+    // Stocke le délégué pour la colonne spécifiée
+    m_delegates[tableName][column] = delegate;
+
+    // Applique le délégué à toutes les vues associées au modèle
+    if (m_views.contains(tableName)) {
+        for (QTableView *view : m_views[tableName]) {
+            view->setItemDelegateForColumn(column, delegate);
+        }
+    }
+}
+
+void TableModelFactory::setRelation(const QString &tableName, int column, const QSqlRelation &relation)
+{
+    if (!m_models.contains(tableName)) {
+        qWarning() << "Modèle non trouvé pour la table" << tableName;
+        return;
+    }
+
+    // Définit la relation pour la colonne spécifiée
+    m_models[tableName]->setRelation(column, relation);
 }
 
 QSqlRelationalTableModel *TableModelFactory::getModel(const QString &tableName) const

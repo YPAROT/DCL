@@ -1,7 +1,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include <QFileDialog>
-
+#include "datedelegate.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -74,6 +74,8 @@ void MainWindow::on_actionLoad_DCL_triggered()
     //Création des modèles via la factory
     m_factory->createModel("Composants",db);
     m_factory->attachView("Composants",ui->vue_edition_composant);
+    m_factory->setRelation("Composants",9,QSqlRelation("Manufacturer","Manuf_ID","Name"));
+    m_factory->setDelegate("Composants",20,new DateDelegate());
 
     //select sur toutes les tables contenues dans la factory
     m_factory->selectOnAllModels();
