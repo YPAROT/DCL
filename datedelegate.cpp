@@ -1,0 +1,51 @@
+#include "datedelegate.h"
+#include <QDateEdit>
+#include <QCalendarWidget>
+#include <QPainter>
+#include <QApplication>
+#include <QSqlTableModel>
+
+DateDelegate::DateDelegate(QObject* parent)
+    : QStyledItemDelegate(parent)
+{
+}
+
+QWidget* DateDelegate::createEditor(QWidget* parent, const QStyleOptionViewItem& option, const QModelIndex& index) const
+{
+    // Utiliser QDateEdit pour afficher un calendrier déroulant
+    QDateEdit* editor = new QDateEdit(parent);
+    editor->setCalendarPopup(true); // Active le popup du calendrier
+    editor->setDisplayFormat("dd/MM/yyyy"); // Format d'affichage de la date
+    return editor;
+}
+
+void DateDelegate::setEditorData(QWidget* editor, const QModelIndex& index) const
+{
+    QDateEdit* dateEdit = static_cast<QDateEdit*>(editor);
+    QString dateString = index.data(Qt::EditRole).toString();
+    dateEdit->setDate(QDate::fromString(dateString,"dd/MM/yyyy"));
+}
+
+void DateDelegate::setModelData(QWidget* editor, QAbstractItemModel* model, const QModelIndex& index) const
+{
+    QDateEdit* dateEdit = static_cast<QDateEdit*>(editor);
+    QDate date = dateEdit->date();
+    model->setData(index, date.toString("dd/MM/yyyy"), Qt::EditRole);
+}
+
+void DateDelegate::paint(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const
+{
+    QStyleOptionViewItem opt = option;
+    opt.displayAlignment = Qt::AlignCenter; //revoir l'alignement
+
+    // Afficher la date formatée
+    QString date = index.data(Qt::DisplayRole).toString();
+
+    //gestion du background role
+    const QSqlTableModel* model = dynamic_cast<const QSqlTableModel*>(index.model());
+    if (model && model->isDirty(index)) {
+        painter->fillRect(opt.rect, Qt::yellow);
+    }
+
+    painter->drawText(opt.rect, date);
+}

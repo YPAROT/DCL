@@ -17,7 +17,7 @@ public:
     int columnCount(const QModelIndex& parent = QModelIndex()) const override;
     bool select() override;
     Qt::ItemFlags flags(const QModelIndex& index) const override;
-    // QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
+    QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
 
     //Fonctions liées à la colonne ajoutée
     int calculateUsedQuantity(int composant_id);

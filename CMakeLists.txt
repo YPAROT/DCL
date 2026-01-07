@@ -42,6 +42,7 @@ qt_add_executable(GenericDCL WIN32 MACOSX_BUNDLE
     qressources.qrc
     componenttablemodel.h componenttablemodel.cpp
     tablemodelfactory.h tablemodelfactory.cpp
+    datedelegate.h datedelegate.cpp
 )
 
 target_compile_definitions(GenericDCL PRIVATE

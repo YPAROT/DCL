@@ -89,6 +89,22 @@ Qt::ItemFlags ComponentTableModel::flags(const QModelIndex &index) const
     return defaultFlags;
 }
 
+QVariant ComponentTableModel::headerData(int section, Qt::Orientation orientation, int role) const
+{
+    if (role != Qt::DisplayRole) return QVariant();
+    if (orientation == Qt::Horizontal) {
+        static const QStringList headers = {
+            "ID", "Famille", "Sous-groupe", "Description", "Part Number", "Valeur", "Tolérance",
+            "Max. rating", "Boîtier", "Fabricant", "Spécification générique", "Spécification détaillée",
+            "Niveau de Qualité", "Qualifié Vol", "Fournisseur", "ITAR / EAS", "Date Code",
+            "Relifed", "Masse", "Statut", "Date de Reception", "Qté Commandée","Lieu de Stockage",
+            "Qté Restante"
+        };
+        if (section < headers.size()) return headers[section];
+    }
+    return QVariant();
+}
+
 int ComponentTableModel::calculateUsedQuantity(int composant_id)
 {
     //Création d'une query
