@@ -3,7 +3,9 @@
 
 #include <QMainWindow>
 #include <QTimer>
+#include <QTableView>
 
+#include "componenttablemodel.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -99,6 +101,9 @@ public slots:
 private:
     Ui::MainWindow *ui;
     QTimer* p_timer_db_valid;
+
+    ComponentTableModel* m_p_model_composant;
+
 };
 
 #endif // MAINWINDOW_H

@@ -40,6 +40,7 @@ qt_add_executable(GenericDCL WIN32 MACOSX_BUNDLE
     sqltableform.cpp sqltableform.h sqltableform.ui
     tableviewmanager.cpp tableviewmanager.h
     qressources.qrc
+    componenttablemodel.h componenttablemodel.cpp
 )
 
 target_compile_definitions(GenericDCL PRIVATE

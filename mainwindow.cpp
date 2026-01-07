@@ -1,5 +1,6 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include <QFileDialog>
 
 
 MainWindow::MainWindow(QWidget *parent)
@@ -12,6 +13,9 @@ MainWindow::MainWindow(QWidget *parent)
     p_timer_db_valid = new QTimer(this);
     connect(p_timer_db_valid,&QTimer::timeout, this,&MainWindow::checkDBStatus);
     p_timer_db_valid->start(1000);
+
+    //initialisation de ce qui touche à la table composant
+    m_p_model_composant = nullptr;
 
 }
 
@@ -35,7 +39,50 @@ void MainWindow::on_actionNew_DCL_triggered()
 
 void MainWindow::on_actionLoad_DCL_triggered()
 {
+    QSqlDatabase db = QSqlDatabase::database(QSqlDatabase::defaultConnectionName(),false);
+    if(!db.isValid())
+    {
+        qDebug()<<"La connection n'existe pas";
+        return;
+    }
 
+    QString filename =QFileDialog::getOpenFileName(nullptr,"Selectionner le fichier de base de donnée",QApplication::applicationDirPath(),"*.db");
+    if(filename.isEmpty())
+        return;
+
+    qDebug()<<"Fichier ouvert: "<<filename;
+
+    //si la db ouverte est la même on ne fait rien
+    if (filename == db.databaseName() && db.isOpen())
+    {
+        qWarning()<<"La Base de donnée est la même que celle en cours";
+        return;
+    }
+
+
+    //fermeture de la base de donnée
+    if (db.isOpen())
+        on_actionClose_triggered();
+
+    db.setDatabaseName(filename);
+    if(!db.open())
+    {
+        ui->statusbar->showMessage("erreur d'ouverture de la base de donnée",5000);
+        return;
+    }
+
+    // Temporaire ici car il y aura à terme pas mal de modèles à gérer)
+
+    //initialisation du modèle
+    m_p_model_composant = new ComponentTableModel(this,db);
+    m_p_model_composant->setTable("Composants");
+    m_p_model_composant->setEditStrategy(QSqlTableModel::OnManualSubmit);
+
+    //Rattachement à la vue
+    ui->vue_edition_composant->setModel(m_p_model_composant);
+
+    //select
+    m_p_model_composant->select();
 }
 
 void MainWindow::on_actionSave_as_triggered()
