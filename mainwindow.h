@@ -2,17 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-#include <QSqlTableModel>
-#include "dcl_sqlmanager.h"
-#include "etiquette.h"
 
-#include "tableviewmanager.h"
-
-QT_FORWARD_DECLARE_CLASS(QTableView)
-QT_FORWARD_DECLARE_CLASS(QPushButton)
-QT_FORWARD_DECLARE_CLASS(QTextEdit)
-QT_FORWARD_DECLARE_CLASS(QSqlError)
-QT_FORWARD_DECLARE_CLASS(QTableWidgetItem)
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -20,12 +10,7 @@ class MainWindow;
 }
 QT_END_NAMESPACE
 
-struct Etiquette_Data
-{
-    QStringList ParamNameList;
-    QStringList ParamValueList;
-    QVector<int> ParamPoliceList;
-};
+
 
 class MainWindow : public QMainWindow
 {
@@ -34,9 +19,7 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
-    Etiquette_Data GetEtiquetteData(QString PN_str);
 
-    void exportToCsv(QTableView *sqlTable, QString tableName);
 
 private slots:
 
@@ -84,8 +67,6 @@ private slots:
 
     void on_lineEdit_projectName_textChanged(const QString &arg1);
 
-    void PrepareSendToEtiquette(void);
-
     void on_spinBox_Etiq_Projet_valueChanged(int arg1);
 
     void on_spinBox_Etiq_param_valueChanged(int arg1);
@@ -95,9 +76,6 @@ private slots:
     void on_pushButton_etq_all_clicked();
 
     void on_pushButton_print_select_etq_clicked();
-
-    void dclCompleteSqlTableDoubleClicked(const QModelIndex &index);
-    void dclPerBoardSqlTableDoubleClicked(const QModelIndex &index);
 
     void on_exportAllToCsvPushButton_clicked();
 
@@ -121,24 +99,14 @@ private slots:
 
     void on_deletePushButton_clicked();
 
-    void tableViewUpdated();
     void on_editTabWidget_currentChanged(int index);
 
 signals:
-    void SendParamToEtiquette(QStringList &Name, QStringList &Value, QVector<int> &Police);
 
     void statusMessage(const QString &message);
 
 private:
     Ui::MainWindow *ui;
-
-    void refreshDCLAll();
-    void refreshEditTables();
-    QString splitRanges(QString ranges);
-
-    DCL_SQLManager *m_dclSQLManager;
-    QList<QStringList> m_csvData;
-    TableViewManager *m_tableViewManager;
 };
 
 #endif // MAINWINDOW_H
