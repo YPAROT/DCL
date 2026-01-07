@@ -66,18 +66,6 @@ private slots:
 
     void on_actionSave_as_triggered();
 
-    void on_lineEdit_projectName_textChanged(const QString &arg1);
-
-    void on_spinBox_Etiq_Projet_valueChanged(int arg1);
-
-    void on_spinBox_Etiq_param_valueChanged(int arg1);
-
-    void on_tableWidget_Etiq_itemSelectionChanged();
-
-    void on_pushButton_etq_all_clicked();
-
-    void on_pushButton_print_select_etq_clicked();
-
     void on_exportAllToCsvPushButton_clicked();
 
     void on_exportBoardDCLToCsvPushButton_clicked();

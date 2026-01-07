@@ -55,7 +55,7 @@
            <enum>QTabWidget::TabPosition::West</enum>
           </property>
           <property name="currentIndex">
-           <number>1</number>
+           <number>0</number>
           </property>
           <widget class="QWidget" name="tab_all">
            <attribute name="title">
@@ -916,101 +916,6 @@
         </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="etiquettesTab">
-       <attribute name="icon">
-        <iconset resource="qressources.qrc">
-         <normaloff>:/images/etiquettes.png</normaloff>:/images/etiquettes.png</iconset>
-       </attribute>
-       <attribute name="title">
-        <string>Etiquettes</string>
-       </attribute>
-       <layout class="QHBoxLayout" name="horizontalLayout">
-        <item>
-         <layout class="QGridLayout" name="gridLayout_3">
-          <item row="6" column="1">
-           <widget class="QPushButton" name="pushButton_etq_all">
-            <property name="text">
-             <string>Tout imprimer en PDF (page de 12x12 étiquettes)</string>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="2">
-           <widget class="QSpinBox" name="spinBox_Etiq_Projet">
-            <property name="value">
-             <number>12</number>
-            </property>
-           </widget>
-          </item>
-          <item row="4" column="1">
-           <widget class="QPushButton" name="pushButton_print_etq">
-            <property name="text">
-             <string>Imprimer la figure de droite en PDF</string>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="0">
-           <widget class="QLabel" name="label_2">
-            <property name="text">
-             <string>Nom du projet</string>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="1">
-           <widget class="QLineEdit" name="lineEdit_projectName"/>
-          </item>
-          <item row="3" column="2">
-           <widget class="QSpinBox" name="spinBox_Etiq_param">
-            <property name="value">
-             <number>6</number>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="2">
-           <widget class="QLabel" name="label_3">
-            <property name="text">
-             <string>Taille de la police</string>
-            </property>
-           </widget>
-          </item>
-          <item row="5" column="1">
-           <widget class="QPushButton" name="pushButton_print_select_etq">
-            <property name="text">
-             <string>Imprimer les étiquettes sélectionnées en PDF (page de 12x12 étiquettes)</string>
-            </property>
-           </widget>
-          </item>
-          <item row="3" column="1">
-           <widget class="QTableWidget" name="tableWidget_Etiq">
-            <property name="editTriggers">
-             <set>QAbstractItemView::EditTrigger::NoEditTriggers</set>
-            </property>
-            <column>
-             <property name="text">
-              <string>Composants</string>
-             </property>
-            </column>
-           </widget>
-          </item>
-         </layout>
-        </item>
-        <item>
-         <spacer name="horizontalSpacer_3">
-          <property name="orientation">
-           <enum>Qt::Orientation::Horizontal</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>224</width>
-            <height>20</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-        <item>
-         <layout class="QVBoxLayout" name="verticalLayout_7"/>
-        </item>
-       </layout>
-      </widget>
       <widget class="QWidget" name="tab_3">
        <attribute name="icon">
         <iconset resource="qressources.qrc">
@@ -1183,7 +1088,7 @@
      <x>0</x>
      <y>0</y>
      <width>907</width>
-     <height>22</height>
+     <height>18</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFiles">

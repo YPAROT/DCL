@@ -132,38 +132,6 @@ void MainWindow::on_editionEndedPushButton_clicked()
 
 }
 
-void MainWindow::on_lineEdit_projectName_textChanged(const QString &arg1)
-{
-
-}
-
-void MainWindow::on_spinBox_Etiq_Projet_valueChanged(int arg1)
-{
-
-}
-
-void MainWindow::on_spinBox_Etiq_param_valueChanged(int arg1)
-{
-
-}
-
-void MainWindow::on_tableWidget_Etiq_itemSelectionChanged()
-{
-
-}
-
-void MainWindow::on_pushButton_etq_all_clicked()
-{
-
-}
-
-
-
-void MainWindow::on_pushButton_print_select_etq_clicked()
-{
-}
-
-
 
 void MainWindow::on_customTableComboBox_currentIndexChanged(int index)
 {
