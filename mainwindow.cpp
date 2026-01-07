@@ -14,8 +14,8 @@ MainWindow::MainWindow(QWidget *parent)
     connect(p_timer_db_valid,&QTimer::timeout, this,&MainWindow::checkDBStatus);
     p_timer_db_valid->start(1000);
 
-    //initialisation de ce qui touche à la table composant
-    m_p_model_composant = nullptr;
+    //création de la factory pour les modèles
+    m_factory = new TableModelFactory(this);
 
 }
 
@@ -62,7 +62,7 @@ void MainWindow::on_actionLoad_DCL_triggered()
 
     //fermeture de la base de donnée
     if (db.isOpen())
-        on_actionClose_triggered();
+        on_actionFermer_une_DCL_triggered();
 
     db.setDatabaseName(filename);
     if(!db.open())
@@ -71,18 +71,13 @@ void MainWindow::on_actionLoad_DCL_triggered()
         return;
     }
 
-    // Temporaire ici car il y aura à terme pas mal de modèles à gérer)
+    //Création des modèles via la factory
+    m_factory->createModel("Composants",db);
+    m_factory->attachView("Composants",ui->vue_edition_composant);
 
-    //initialisation du modèle
-    m_p_model_composant = new ComponentTableModel(this,db);
-    m_p_model_composant->setTable("Composants");
-    m_p_model_composant->setEditStrategy(QSqlTableModel::OnManualSubmit);
+    //select sur toutes les tables contenues dans la factory
+    m_factory->selectOnAllModels();
 
-    //Rattachement à la vue
-    ui->vue_edition_composant->setModel(m_p_model_composant);
-
-    //select
-    m_p_model_composant->select();
 }
 
 void MainWindow::on_actionSave_as_triggered()
@@ -257,3 +252,16 @@ void MainWindow::checkDBStatus()
     ui->statusbar->showMessage(status);
     return;
 }
+
+void MainWindow::on_actionFermer_une_DCL_triggered()
+{
+    QSqlDatabase db = QSqlDatabase::database(QSqlDatabase::defaultConnectionName(),false);
+
+    //fermeture de la db
+    if(!db.isOpen())
+        return;
+    db.close();
+
+    m_factory->clearAllModels();
+}
+

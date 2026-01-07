@@ -5,7 +5,7 @@
 #include <QTimer>
 #include <QTableView>
 
-#include "componenttablemodel.h"
+#include "tablemodelfactory.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -92,6 +92,8 @@ private slots:
 
     void on_editTabWidget_currentChanged(int index);
 
+    void on_actionFermer_une_DCL_triggered();
+
 public slots:
     void checkDBStatus();
 
@@ -102,7 +104,7 @@ private:
     Ui::MainWindow *ui;
     QTimer* p_timer_db_valid;
 
-    ComponentTableModel* m_p_model_composant;
+    TableModelFactory* m_factory;
 
 };
 

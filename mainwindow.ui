@@ -1083,10 +1083,9 @@
      <string>Fichiers</string>
     </property>
     <addaction name="actionNew_DCL"/>
-    <addaction name="separator"/>
     <addaction name="actionLoad_DCL"/>
-    <addaction name="separator"/>
     <addaction name="actionSave_as"/>
+    <addaction name="actionFermer_une_DCL"/>
     <addaction name="separator"/>
     <addaction name="actionClose"/>
    </widget>
@@ -1114,7 +1113,7 @@
   <action name="actionNew_DCL">
    <property name="icon">
     <iconset resource="qressources.qrc">
-     <normaloff>:/images/Edit Clear.png</normaloff>:/images/Edit Clear.png</iconset>
+     <normaloff>:/images/settings.png</normaloff>:/images/settings.png</iconset>
    </property>
    <property name="text">
     <string>Nouvelle DCL</string>
@@ -1235,6 +1234,11 @@
   <action name="actionOptions">
    <property name="text">
     <string>Options...</string>
+   </property>
+  </action>
+  <action name="actionFermer_une_DCL">
+   <property name="text">
+    <string>Fermer une DCL</string>
    </property>
   </action>
  </widget>

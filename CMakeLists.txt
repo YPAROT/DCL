@@ -41,6 +41,7 @@ qt_add_executable(GenericDCL WIN32 MACOSX_BUNDLE
     tableviewmanager.cpp tableviewmanager.h
     qressources.qrc
     componenttablemodel.h componenttablemodel.cpp
+    tablemodelfactory.h tablemodelfactory.cpp
 )
 
 target_compile_definitions(GenericDCL PRIVATE

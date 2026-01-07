@@ -21,6 +21,8 @@ public:
 
     //Fonctions liées à la colonne ajoutée
     int calculateUsedQuantity(int composant_id);
+    int calculateDBStock(int composant_id);
+
 
 private:
     QList<int> m_stock;

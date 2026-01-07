@@ -61,7 +61,15 @@ bool ComponentTableModel::select()
 {
     bool success = QSqlRelationalTableModel::select();
     //On prépare la colonne supplémentaire
-    m_stock.resize(static_cast<qsizetype>(columnCount()));
+    m_stock.clear();
+    for(int i=0;i<rowCount();i++)
+    {
+        int composant_id = QSqlTableModel::data(this->index(i, 0), Qt::EditRole).toInt();
+        m_stock.append(calculateDBStock(composant_id));
+    }
+    //m_stock.resize(static_cast<qsizetype>(columnCount()));
+    emit dataChanged(this->index(0,21),this->index(rowCount(),columnCount()-1));
+
 
     return success;
 
@@ -93,3 +101,14 @@ int ComponentTableModel::calculateUsedQuantity(int composant_id)
 
 }
 
+int ComponentTableModel::calculateDBStock(int composant_id)
+{
+    //Création d'une query
+    QSqlQuery orderedQuery(database());
+    orderedQuery.prepare("SELECT Quantity_ordered FROM Composants WHERE ID = ?");
+    orderedQuery.addBindValue(composant_id);
+    orderedQuery.exec();
+    orderedQuery.next();
+    return orderedQuery.value(0).toInt()-calculateUsedQuantity(composant_id);
+
+}
