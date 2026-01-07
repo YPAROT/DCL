@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QTimer>
 
 
 QT_BEGIN_NAMESPACE
@@ -101,12 +102,15 @@ private slots:
 
     void on_editTabWidget_currentChanged(int index);
 
-signals:
+public slots:
+    void checkDBStatus();
 
-    void statusMessage(const QString &message);
+
+
 
 private:
     Ui::MainWindow *ui;
+    QTimer* p_timer_db_valid;
 };
 
 #endif // MAINWINDOW_H

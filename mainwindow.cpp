@@ -8,6 +8,11 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
 
+    //initialisation du timer vérifiant l'état de la db
+    p_timer_db_valid = new QTimer(this);
+    connect(p_timer_db_valid,&QTimer::timeout, this,&MainWindow::checkDBStatus);
+    p_timer_db_valid->start(1000);
+
 }
 
 MainWindow::~MainWindow()
@@ -220,4 +225,20 @@ void MainWindow::on_deletePushButton_clicked()
 void MainWindow::on_editTabWidget_currentChanged(int index)
 {
 
+}
+
+void MainWindow::checkDBStatus()
+{
+    QSqlDatabase db = QSqlDatabase::database(QSqlDatabase::defaultConnectionName(),false);
+    QString db_open_str="Ouverte";
+    if (!db.isOpen())
+        db_open_str = "Fermée";
+
+    QString connection_open_str="Ouvert";
+    if (!db.isValid())
+        connection_open_str = "Fermé";
+
+    QString status = QString("Etat du lien: %1   Base de donnée: %2").arg(connection_open_str,db_open_str);
+    ui->statusbar->showMessage(status);
+    return;
 }
