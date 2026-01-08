@@ -761,7 +761,7 @@
            </attribute>
            <layout class="QGridLayout" name="gridLayout_10">
             <item row="0" column="0">
-             <widget class="QTableView" name="vue_edition_composant"/>
+             <widget class="FilterTableView" name="vue_edition_composant" native="true"/>
             </item>
            </layout>
           </widget>
@@ -1243,6 +1243,12 @@
   </action>
  </widget>
  <customwidgets>
+  <customwidget>
+   <class>FilterTableView</class>
+   <extends>QWidget</extends>
+   <header>filtertableview.h</header>
+   <container>1</container>
+  </customwidget>
   <customwidget>
    <class>SQLTableForm</class>
    <extends>QWidget</extends>

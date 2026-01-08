@@ -45,6 +45,9 @@ qt_add_executable(GenericDCL WIN32 MACOSX_BUNDLE
     datedelegate.h datedelegate.cpp
     foreignkeydelegate.h foreignkeydelegate.cpp
     ouinondelegate.h ouinondelegate.cpp
+    filtertableview.h filtertableview.cpp filtertableview.ui
+    customtableview.h customtableview.cpp
+
 )
 
 target_compile_definitions(GenericDCL PRIVATE

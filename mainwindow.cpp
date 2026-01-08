@@ -73,10 +73,9 @@ void MainWindow::on_actionLoad_DCL_triggered()
         return;
     }
 
-    //Création des modèles via la factory
+    //Création des modèles et rattachement aux vues via la factory
     m_factory->createModel("Composants",db);
-    m_factory->attachView("Composants",ui->vue_edition_composant);
-    //m_factory->setRelation("Composants",9,QSqlRelation("Manufacturer","Manuf_ID","Name"));
+    m_factory->attachView("Composants",ui->vue_edition_composant->getTableView());
     m_factory->setDelegate("Composants",9,new ForeignKeyDelegate(this,"Manufacturer","Name","Manuf_ID",db));
     m_factory->setDelegate("Composants",13,new OuiNonDelegate(this));
     m_factory->setDelegate("Composants",14,new ForeignKeyDelegate(this,"Procurement Company","Name","Proc_ID",db));

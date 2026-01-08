@@ -1,6 +1,7 @@
 #include "componenttablemodel.h"
 #include <QBrush>
 #include <QSqlQuery>
+#include <QSqlError>
 
 ComponentTableModel::ComponentTableModel(QObject *parent, const QSqlDatabase &db)
     : QSqlRelationalTableModel{parent,db}
@@ -126,5 +127,35 @@ int ComponentTableModel::calculateDBStock(int composant_id)
     orderedQuery.exec();
     orderedQuery.next();
     return orderedQuery.value(0).toInt()-calculateUsedQuantity(composant_id);
+
+}
+
+void ComponentTableModel::copySelectedRows(const QModelIndexList &selectedRows)
+{
+    m_copiedRecords.clear(); // Efface les enregistrements précédemment copiés
+
+    for (const QModelIndex &index : selectedRows) {
+        int row = index.row();
+        // Récupère le QSqlRecord de la ligne (sans la colonne supplémentaire)
+        QSqlRecord record = this->record(row);
+        m_copiedRecords.append(record);
+    }
+}
+
+
+void ComponentTableModel::pasteCopiedRows()
+{
+    if (m_copiedRecords.isEmpty()) {
+        return; // Rien à coller
+    }
+
+    // Insère chaque enregistrement copié à la fin du modèle
+    for (const QSqlRecord &record : std::as_const(m_copiedRecords)) {
+        // Insère le record à la fin (-1)
+        if (!insertRecord(-1, record)) {
+            qWarning() << "Échec de l'insertion de la ligne:" << lastError().text();
+            continue;
+        }
+    }
 
 }

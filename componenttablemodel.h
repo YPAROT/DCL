@@ -3,6 +3,7 @@
 
 #include <QSqlRelationalTableModel>
 #include <QList>
+#include <QSqlRecord>
 
 class ComponentTableModel : public QSqlRelationalTableModel
 {
@@ -23,9 +24,14 @@ public:
     int calculateUsedQuantity(int composant_id);
     int calculateDBStock(int composant_id);
 
+    //copier/coller
+    void copySelectedRows(const QModelIndexList &selectedRows);
+    void pasteCopiedRows();
+
 
 private:
     QList<int> m_stock;
+    QList<QSqlRecord> m_copiedRecords; // Pour stocker les lignes copiées
 };
 
 #endif // COMPONENTTABLEMODEL_H
