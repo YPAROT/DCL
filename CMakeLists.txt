@@ -47,6 +47,7 @@ qt_add_executable(GenericDCL WIN32 MACOSX_BUNDLE
     ouinondelegate.h ouinondelegate.cpp
     filtertableview.h filtertableview.cpp filtertableview.ui
     customtableview.h customtableview.cpp
+    componentproxymodel.h componentproxymodel.cpp
 
 )
 
