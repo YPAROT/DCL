@@ -11,7 +11,7 @@ ForeignKeyDelegate::ForeignKeyDelegate(
     const QString &displayColumn,
     const QString &keyColumn,
     QSqlDatabase db
-    ) : QStyledItemDelegate(parent),
+    ) : ProxyDelegate(parent),
     m_foreignTable(foreignTable),
     m_displayColumn(displayColumn),
     m_keyColumn(keyColumn),
@@ -20,7 +20,7 @@ ForeignKeyDelegate::ForeignKeyDelegate(
 }
 
 QWidget *ForeignKeyDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const
-{
+{   
     QComboBox *editor = new QComboBox(parent);
     editor->setEditable(false); // Désactive l'édition directe
 
@@ -39,8 +39,10 @@ void ForeignKeyDelegate::setEditorData(QWidget *editor, const QModelIndex &index
     QComboBox *comboBox = qobject_cast<QComboBox *>(editor);
     if (!comboBox) return;
 
+    //On récupère le bon index si il y a un proxy
+    QModelIndex source_index = m_proxy ? m_proxy->mapToSource(index) : index;
     // Récupère la valeur actuelle de l'index
-    QVariant currentId = index.data(Qt::EditRole);
+    QVariant currentId = source_index.data(Qt::EditRole);
     // Récupère le nom actuel
     QSqlQuery query(m_db);
     query.prepare(QString("SELECT %1 FROM %2 WHERE %3 = ?").arg(m_displayColumn, m_foreignTable, m_keyColumn));
@@ -56,16 +58,20 @@ void ForeignKeyDelegate::setModelData(QWidget *editor, QAbstractItemModel *model
     QComboBox *comboBox = qobject_cast<QComboBox *>(editor);
     if (!comboBox) return;
 
+    //On récupère le bon index si il y a un proxy
+    QModelIndex source_index = m_proxy ? m_proxy->mapToSource(index) : index;
     // Récupère l'ID sélectionné
     int foreignKey = comboBox->currentData().toInt();
     // Met à jour le modèle avec la nouvelle valeur
-    model->setData(index, foreignKey, Qt::EditRole);
+    model->setData(source_index, foreignKey, Qt::EditRole);
 }
 
 void ForeignKeyDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
+    //On récupère le bon index si il y a un proxy
+    QModelIndex source_index = m_proxy ? m_proxy->mapToSource(index) : index;
     // Récupère la valeur actuelle de l'index
-    QVariant currentId = index.data(Qt::EditRole);
+    QVariant currentId = source_index.data(Qt::EditRole);
     // Récupère le nom à afficher
     QSqlQuery query(m_db);
     query.prepare(QString("SELECT %1 FROM %2 WHERE %3 = ?").arg(m_displayColumn, m_foreignTable, m_keyColumn));
@@ -82,11 +88,13 @@ void ForeignKeyDelegate::paint(QPainter *painter, const QStyleOptionViewItem &op
 
 
     //gestion du background role
-    const QSqlRelationalTableModel* model = dynamic_cast<const QSqlRelationalTableModel*>(index.model());
-    if (model && model->isDirty(index)) {
+    const QSqlRelationalTableModel* model = dynamic_cast<const QSqlRelationalTableModel*>(source_index.model());
+    if (model && model->isDirty(source_index)) {
         painter->fillRect(opt.rect, Qt::yellow);
     }
 
     // Dessine le texte
     painter->drawText(opt.rect, displayText,opt.displayAlignment);
 }
+
+

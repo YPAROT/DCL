@@ -4,7 +4,7 @@
 #include <QSqlRelationalTableModel>
 
 OuiNonDelegate::OuiNonDelegate(QObject *parent)
-    : QStyledItemDelegate(parent)
+    : ProxyDelegate(parent)
 {
 }
 
@@ -22,7 +22,10 @@ void OuiNonDelegate::setEditorData(QWidget *editor, const QModelIndex &index) co
     QComboBox *comboBox = qobject_cast<QComboBox *>(editor);
     if (!comboBox) return;
 
-    QVariant value = index.data(Qt::EditRole);
+    //On récupère le bon index si il y a un proxy
+    QModelIndex source_index = m_proxy ? m_proxy->mapToSource(index) : index;
+
+    QVariant value = source_index.data(Qt::EditRole);
     if (!value.isValid()) {
         comboBox->setCurrentIndex(0); // "Null"
     } else if (value.toBool()) {
@@ -37,6 +40,9 @@ void OuiNonDelegate::setModelData(QWidget *editor, QAbstractItemModel *model, co
     QComboBox *comboBox = qobject_cast<QComboBox *>(editor);
     if (!comboBox) return;
 
+    //On récupère le bon index si il y a un proxy
+    QModelIndex source_index = m_proxy ? m_proxy->mapToSource(index) : index;
+
     int currentIndex = comboBox->currentIndex();
     QVariant value;
     if (currentIndex == 0) {
@@ -47,7 +53,7 @@ void OuiNonDelegate::setModelData(QWidget *editor, QAbstractItemModel *model, co
         value = false; // "Non"
     }
 
-    model->setData(index, value, Qt::EditRole);
+    model->setData(source_index, value, Qt::EditRole);
 }
 
 void OuiNonDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
@@ -55,7 +61,10 @@ void OuiNonDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option
     QStyleOptionViewItem opt = option;
     opt.displayAlignment = Qt::AlignCenter;
 
-    QVariant value = index.data(Qt::DisplayRole);
+    //On récupère le bon index si il y a un proxy
+    QModelIndex source_index = m_proxy ? m_proxy->mapToSource(index) : index;
+
+    QVariant value = source_index.data(Qt::DisplayRole);
     QString text;
     if (!value.isValid()) {
         text = "Null";
@@ -66,10 +75,11 @@ void OuiNonDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option
     }
 
     //gestion du background role
-    const QSqlRelationalTableModel* model = dynamic_cast<const QSqlRelationalTableModel*>(index.model());
-    if (model && model->isDirty(index)) {
+    const QSqlRelationalTableModel* model = dynamic_cast<const QSqlRelationalTableModel*>(source_index.model());
+    if (model && model->isDirty(source_index)) {
         painter->fillRect(opt.rect, Qt::yellow);
     }
 
     painter->drawText(opt.rect, text,opt.displayAlignment);
 }
+

@@ -7,7 +7,8 @@
 #include <QMap>
 #include <QList>
 #include <QSqlDatabase>
-#include <QStyledItemDelegate>
+#include <QSortFilterProxyModel>
+#include "proxydelegate.h"
 
 class TableModelFactory : public QObject
 {
@@ -22,6 +23,15 @@ public:
     // Associe une vue à un modèle existant
     void attachView(const QString &tableName, QTableView *view);
 
+    //Attache un proxy
+    void attachSortFilterProxyModel(const QString &tableName,const QString &viewName, QSortFilterProxyModel *proxy);
+
+    //detache un proxy
+    void detachSortFilterProxyModel(const QString &tableName,const QString &viewName);
+
+    //detache tous les proxy
+    void detachAllSortFilterProxyModel();
+
     // Supprime tous les modèles et détache toutes les vues
     void clearAllModels();
 
@@ -35,7 +45,7 @@ public:
     bool selectOnModel(const QString &tableName);
 
     // Définit un délégué personnalisé pour une colonne spécifique d'un modèle
-    void setDelegate(const QString &tableName, int column, QStyledItemDelegate *delegate);
+    void setDelegate(const QString &tableName, int column, ProxyDelegate *delegate);
 
     // Définit une relation pour une colonne d'un modèle
     void setRelation(const QString &tableName, int column, const QSqlRelation &relation);
@@ -44,13 +54,18 @@ public:
     QSqlRelationalTableModel *getModel(const QString &tableName) const;
 
 private:
+    QString retrieveTableNameFromView(QTableView* view);
+
+private:
     using ModelMap = QMap<QString, QSqlRelationalTableModel*>;
     using ViewMap = QMap<QString, QList<QTableView*>>;
-    using DelegateMap = QMap<QString, QMap<int, QStyledItemDelegate *>>;
+    using DelegateMap = QMap<QString, QMap<int, ProxyDelegate *>>;
+    using ProxyMap = QMap<QString,QSortFilterProxyModel*>;
 
     ModelMap m_models;
     ViewMap m_views;
     DelegateMap m_delegates;
+    ProxyMap m_proxies;
 };
 
 #endif // TABLEMODELFACTORY_H

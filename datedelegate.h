@@ -1,10 +1,10 @@
 #ifndef DATEDELEGATE_H
 #define DATEDELEGATE_H
 
-#include <QStyledItemDelegate>
 #include <QDate>
+#include "proxydelegate.h"
 
-class DateDelegate : public QStyledItemDelegate
+class DateDelegate : public ProxyDelegate
 {
     Q_OBJECT
 

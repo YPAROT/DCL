@@ -2,11 +2,10 @@
 #include <QDateEdit>
 #include <QCalendarWidget>
 #include <QPainter>
-//#include <QApplication>
 #include <QSqlRelationalTableModel>
 
 DateDelegate::DateDelegate(QObject* parent)
-    : QStyledItemDelegate(parent)
+    : ProxyDelegate(parent)
 {
 }
 
@@ -21,29 +20,38 @@ QWidget* DateDelegate::createEditor(QWidget* parent, const QStyleOptionViewItem&
 
 void DateDelegate::setEditorData(QWidget* editor, const QModelIndex& index) const
 {
+    //On récupère le bon index si il y a un proxy
+    QModelIndex source_index = m_proxy ? m_proxy->mapToSource(index) : index;
+
     QDateEdit* dateEdit = static_cast<QDateEdit*>(editor);
-    QString dateString = index.data(Qt::EditRole).toString();
+    QString dateString = source_index.data(Qt::EditRole).toString();
     dateEdit->setDate(QDate::fromString(dateString,"dd/MM/yyyy"));
 }
 
 void DateDelegate::setModelData(QWidget* editor, QAbstractItemModel* model, const QModelIndex& index) const
 {
+    //On récupère le bon index si il y a un proxy
+    QModelIndex source_index = m_proxy ? m_proxy->mapToSource(index) : index;
+
     QDateEdit* dateEdit = static_cast<QDateEdit*>(editor);
     QDate date = dateEdit->date();
-    model->setData(index, date.toString("dd/MM/yyyy"), Qt::EditRole);
+    model->setData(source_index, date.toString("dd/MM/yyyy"), Qt::EditRole);
 }
 
 void DateDelegate::paint(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const
 {
+    //On récupère le bon index si il y a un proxy
+    QModelIndex source_index = m_proxy ? m_proxy->mapToSource(index) : index;
+
     QStyleOptionViewItem opt = option;
     opt.displayAlignment = Qt::AlignCenter; //revoir l'alignement
 
     // Afficher la date formatée
-    QString date = index.data(Qt::DisplayRole).toString();
+    QString date = source_index.data(Qt::DisplayRole).toString();
 
     //gestion du background role
-    const QSqlRelationalTableModel* model = dynamic_cast<const QSqlRelationalTableModel*>(index.model());
-    if (model && model->isDirty(index)) {
+    const QSqlRelationalTableModel* model = dynamic_cast<const QSqlRelationalTableModel*>(source_index.model());
+    if (model && model->isDirty(source_index)) {
         painter->fillRect(opt.rect, Qt::yellow);
     }
 

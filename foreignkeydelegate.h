@@ -1,11 +1,10 @@
 #ifndef FOREIGNKEYDELEGATE_H
 #define FOREIGNKEYDELEGATE_H
 
-#include <QStyledItemDelegate>
 #include <QSqlDatabase>
-#include <QSortFilterProxyModel>
+#include "proxydelegate.h"
 
-class ForeignKeyDelegate : public QStyledItemDelegate
+class ForeignKeyDelegate : public ProxyDelegate
 {
     Q_OBJECT
 public:
@@ -21,6 +20,7 @@ public:
     void setEditorData(QWidget *editor, const QModelIndex &index) const override;
     void setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const override;
     void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
+
 
 private:
     QString m_foreignTable;
