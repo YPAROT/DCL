@@ -23,7 +23,6 @@ MainWindow::MainWindow(QWidget *parent)
 
 MainWindow::~MainWindow()
 {
-
     delete ui;
 }
 
@@ -74,6 +73,7 @@ void MainWindow::on_actionLoad_DCL_triggered()
     }
 
     //Création des modèles et rattachement aux vues via la factory
+    //-> Table Composants
     m_factory->createModel("Composants",db);
     m_factory->attachView("Composants",ui->vue_edition_composant->getTableView());
     m_factory->setDelegate("Composants",9,new ForeignKeyDelegate(this,"Manufacturer","Name","Manuf_ID",db));

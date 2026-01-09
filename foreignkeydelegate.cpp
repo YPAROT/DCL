@@ -76,14 +76,17 @@ void ForeignKeyDelegate::paint(QPainter *painter, const QStyleOptionViewItem &op
         displayText = query.value(0).toString();
     }
 
-    // Dessine le texte
+    // Gestion des options de dessin
     QStyleOptionViewItem opt = option;
     opt.displayAlignment = Qt::AlignLeft | Qt::AlignVCenter;
-    painter->drawText(opt.rect, displayText,opt.displayAlignment);
+
 
     //gestion du background role
     const QSqlRelationalTableModel* model = dynamic_cast<const QSqlRelationalTableModel*>(index.model());
     if (model && model->isDirty(index)) {
         painter->fillRect(opt.rect, Qt::yellow);
     }
+
+    // Dessine le texte
+    painter->drawText(opt.rect, displayText,opt.displayAlignment);
 }

@@ -3,6 +3,8 @@
 
 #include <QWidget>
 #include <QTableView>
+#include <QList>
+#include <QLineEdit>
 
 namespace Ui {
 class FilterTableView;
@@ -25,6 +27,7 @@ protected slots:
 
 private:
     Ui::FilterTableView *ui;
+    QList<QLineEdit*> m_filters_edit;
 };
 
 #endif // FILTERTABLEVIEW_H

@@ -65,11 +65,11 @@ void OuiNonDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option
         text = "Non";
     }
 
-    painter->drawText(opt.rect, text,opt.displayAlignment);
-
     //gestion du background role
     const QSqlRelationalTableModel* model = dynamic_cast<const QSqlRelationalTableModel*>(index.model());
     if (model && model->isDirty(index)) {
         painter->fillRect(opt.rect, Qt::yellow);
     }
+
+    painter->drawText(opt.rect, text,opt.displayAlignment);
 }

@@ -38,18 +38,19 @@ QVariant ComponentTableModel::data(const QModelIndex &index, int role) const
 
 bool ComponentTableModel::setData(const QModelIndex &index, const QVariant &value, int role)
 {
-    //On doit recalculer le nombre de composants restant
-    //Cela se fait si on touche à la colonne 21
-    if(index.column()==21)
-    {
-        if (value.canConvert<int>())
-        {
-            int composant_id = QSqlTableModel::data(this->index(index.row(), 0), Qt::EditRole).toInt();
-            m_stock[index.row()] = value.toInt()-calculateUsedQuantity(composant_id);
-        }
-    }
+    if (!index.isValid()) return false;
 
-    return QSqlRelationalTableModel::setData(index,value,role);
+    if (index.column() == 21) {
+        if (value.canConvert<int>()) {
+            int composant_id = QSqlTableModel::data(this->index(index.row(), 0), Qt::EditRole).toInt();
+            m_stock[index.row()] = value.toInt() - calculateUsedQuantity(composant_id);
+            emit dataChanged(index, index); // Rafraîchit uniquement cette cellule
+            return true;
+        }
+        return false;
+    }
+    // Pour les autres colonnes, utilise le comportement par défaut
+    return QSqlRelationalTableModel::setData(index, value, role);
 }
 
 int ComponentTableModel::columnCount(const QModelIndex &parent) const
@@ -60,18 +61,22 @@ int ComponentTableModel::columnCount(const QModelIndex &parent) const
 
 bool ComponentTableModel::select()
 {
+
+    qDebug() << "Select est appelé sur" << this;
     bool success = QSqlRelationalTableModel::select();
-    //On prépare la colonne supplémentaire
     m_stock.clear();
-    for(int i=0;i<rowCount();i++)
-    {
-        int composant_id = QSqlTableModel::data(this->index(i, 0), Qt::EditRole).toInt();
-        m_stock.append(calculateDBStock(composant_id));
+    if (success && rowCount() > 0) {  // Vérifie que rowCount() > 0
+        for(int i = 0; i < rowCount(); i++) {
+            int composant_id = QSqlTableModel::data(this->index(i, 0), Qt::EditRole).toInt();
+            m_stock.append(calculateDBStock(composant_id));
+        }
+        // Émet dataChanged() uniquement si rowCount() > 0
+        QModelIndex topLeft = this->index(0, 21);
+        QModelIndex bottomRight = this->index(rowCount() - 1, columnCount() - 1);
+        if (topLeft.isValid() && bottomRight.isValid()) {
+            emit dataChanged(topLeft, bottomRight);
+        }
     }
-    //m_stock.resize(static_cast<qsizetype>(columnCount()));
-    emit dataChanged(this->index(0,21),this->index(rowCount(),columnCount()-1));
-
-
     return success;
 
 }

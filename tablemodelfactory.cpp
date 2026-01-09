@@ -9,7 +9,8 @@ TableModelFactory::TableModelFactory(QObject *parent)
 TableModelFactory::~TableModelFactory()
 {
     // Nettoie tous les modèles et vues avant la destruction de la factory
-    clearAllModels();
+    //clearAllModels();
+    //pas besoin car tout hérite de qObject et il est des cas où l'objet view est delete sans que le pointeur soit nullptr
 }
 
 QSqlRelationalTableModel *TableModelFactory::createModel(const QString &tableName, const QSqlDatabase &db)
@@ -58,6 +59,7 @@ void TableModelFactory::clearAllModels()
     // Détache toutes les vues de leurs modèles
     for (auto it = m_views.begin(); it != m_views.end(); ++it) {
         for (QTableView *view : it.value()) {
+            qDebug()<<"Détache la vue "<<view<<" du modèle";
             view->setModel(nullptr);
         }
     }
