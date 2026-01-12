@@ -1,5 +1,6 @@
 #include "tablemodelfactory.h"
 #include "componenttablemodel.h"
+#include "customrelationalmodel.h"
 
 TableModelFactory::TableModelFactory(QObject *parent)
     : QObject(parent)
@@ -29,7 +30,7 @@ QSqlRelationalTableModel *TableModelFactory::createModel(const QString &tableNam
         model = new ComponentTableModel(this);
     }else
     {
-        model = new QSqlRelationalTableModel(this);
+        model = new CustomRelationalModel(this);
     }
 
 

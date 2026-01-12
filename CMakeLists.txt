@@ -49,6 +49,7 @@ qt_add_executable(GenericDCL WIN32 MACOSX_BUNDLE
     customtableview.h customtableview.cpp
     componentproxymodel.h componentproxymodel.cpp
     proxydelegate.h proxydelegate.cpp
+    customrelationalmodel.h customrelationalmodel.cpp
 
 )
 
