@@ -114,6 +114,61 @@ void MainWindow::on_actionLoad_DCL_triggered()
     m_factory->setDelegate("Composants",ui->dclCompleteSqlTableWidget->getTableView()->objectName(),22,new ForeignKeyDelegate(this,"Stockage","Location","ID",db));
 
 
+    //-> Table carte
+    m_factory->createModel("Board",db);
+    //Vue edition
+    m_factory->attachView("Board",ui->editBoardSqlTableWidget->getTableView());
+    proxy = new ComponentProxyModel();
+    m_factory->attachSortFilterProxyModel("Board",ui->editBoardSqlTableWidget->getTableView()->objectName(),proxy);
+    //Connection des filtres au proxy
+    connect(ui->editBoardSqlTableWidget,&FilterTableView::filtersChanged,proxy,&ComponentProxyModel::setFilters);
+
+    //-> Table Fournisseurs
+    m_factory->createModel("Procurement Company",db);
+    //Vue edition
+    m_factory->attachView("Procurement Company",ui->editCompanySqlTableWidget->getTableView());
+    proxy = new ComponentProxyModel();
+    m_factory->attachSortFilterProxyModel("Procurement Company",ui->editCompanySqlTableWidget->getTableView()->objectName(),proxy);
+    //Connection des filtres au proxy
+    connect(ui->editCompanySqlTableWidget,&FilterTableView::filtersChanged,proxy,&ComponentProxyModel::setFilters);
+
+    //-> Table Contact Fournisseurs
+    m_factory->createModel("Procurement Company Contact",db);
+    //Vue edition
+    m_factory->attachView("Procurement Company Contact",ui->editContactSqlTableWidget->getTableView());
+    proxy = new ComponentProxyModel();
+    m_factory->attachSortFilterProxyModel("Procurement Company Contact",ui->editContactSqlTableWidget->getTableView()->objectName(),proxy);
+    //Connection des filtres au proxy
+    connect(ui->editContactSqlTableWidget,&FilterTableView::filtersChanged,proxy,&ComponentProxyModel::setFilters);
+    //delegates
+    m_factory->setDelegate("Procurement Company Contact",ui->editContactSqlTableWidget->getTableView()->objectName(),5,new ForeignKeyDelegate(this,"Procurement Company","Name","Proc_ID",db));
+
+    //-> Table Fabricants
+    m_factory->createModel("Manufacturer",db);
+    //Vue edition
+    m_factory->attachView("Manufacturer",ui->editManufacturerSqlTableWidget->getTableView());
+    proxy = new ComponentProxyModel();
+    m_factory->attachSortFilterProxyModel("Manufacturer",ui->editManufacturerSqlTableWidget->getTableView()->objectName(),proxy);
+    //Connection des filtres au proxy
+    connect(ui->editManufacturerSqlTableWidget,&FilterTableView::filtersChanged,proxy,&ComponentProxyModel::setFilters);
+
+    //-> Table Status
+    m_factory->createModel("Status",db);
+    //Vue edition
+    m_factory->attachView("Status",ui->statusSQLTableWidget->getTableView());
+    proxy = new ComponentProxyModel();
+    m_factory->attachSortFilterProxyModel("Status",ui->statusSQLTableWidget->getTableView()->objectName(),proxy);
+    //Connection des filtres au proxy
+    connect(ui->statusSQLTableWidget,&FilterTableView::filtersChanged,proxy,&ComponentProxyModel::setFilters);
+
+    //-> Table stockage
+    m_factory->createModel("Stockage",db);
+    //Vue edition
+    m_factory->attachView("Stockage",ui->editStockageSqlTableWidget->getTableView());
+    proxy = new ComponentProxyModel();
+    m_factory->attachSortFilterProxyModel("Stockage",ui->editStockageSqlTableWidget->getTableView()->objectName(),proxy);
+    //Connection des filtres au proxy
+    connect(ui->editStockageSqlTableWidget,&FilterTableView::filtersChanged,proxy,&ComponentProxyModel::setFilters);
 
 
     //select sur toutes les tables contenues dans la factory

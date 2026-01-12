@@ -59,7 +59,7 @@
           </property>
           <widget class="QWidget" name="tab_all">
            <attribute name="title">
-            <string>DCL complète</string>
+            <string>Stock de Composants</string>
            </attribute>
            <layout class="QHBoxLayout" name="horizontalLayout_5">
             <item>
@@ -747,128 +747,6 @@
         <string>Edition</string>
        </attribute>
        <layout class="QGridLayout" name="gridLayout">
-        <item row="0" column="0">
-         <widget class="QTabWidget" name="editTabWidget">
-          <property name="tabPosition">
-           <enum>QTabWidget::TabPosition::West</enum>
-          </property>
-          <property name="currentIndex">
-           <number>0</number>
-          </property>
-          <widget class="QWidget" name="Tab_comp_edit">
-           <attribute name="title">
-            <string>Composants</string>
-           </attribute>
-           <layout class="QGridLayout" name="gridLayout_10">
-            <item row="0" column="0">
-             <widget class="FilterTableView" name="vue_edition_composant" native="true"/>
-            </item>
-           </layout>
-          </widget>
-          <widget class="QWidget" name="tab_board_edit">
-           <attribute name="title">
-            <string>Cartes</string>
-           </attribute>
-           <layout class="QGridLayout" name="gridLayout_4">
-            <item row="0" column="0">
-             <widget class="SQLTableForm" name="editBoardSqlTableWidget" native="true">
-              <property name="minimumSize">
-               <size>
-                <width>0</width>
-                <height>200</height>
-               </size>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </widget>
-          <widget class="QWidget" name="tab_manuf_edit">
-           <attribute name="title">
-            <string>Fournisseurs</string>
-           </attribute>
-           <layout class="QGridLayout" name="gridLayout_9">
-            <item row="0" column="0">
-             <widget class="SQLTableForm" name="editCompanySqlTableWidget" native="true">
-              <property name="minimumSize">
-               <size>
-                <width>0</width>
-                <height>200</height>
-               </size>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </widget>
-          <widget class="QWidget" name="Contacts">
-           <attribute name="title">
-            <string>Contacts</string>
-           </attribute>
-           <layout class="QGridLayout" name="gridLayout_14">
-            <item row="0" column="0">
-             <widget class="SQLTableForm" name="editContactSqlTableWidget" native="true">
-              <property name="minimumSize">
-               <size>
-                <width>0</width>
-                <height>200</height>
-               </size>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </widget>
-          <widget class="QWidget" name="tab_fourn_edit">
-           <attribute name="title">
-            <string>Fabricants</string>
-           </attribute>
-           <layout class="QGridLayout" name="gridLayout_8">
-            <item row="0" column="0">
-             <widget class="SQLTableForm" name="editManufacturerSqlTableWidget" native="true">
-              <property name="minimumSize">
-               <size>
-                <width>0</width>
-                <height>200</height>
-               </size>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </widget>
-          <widget class="QWidget" name="tab_statut_edit">
-           <attribute name="title">
-            <string>Statut</string>
-           </attribute>
-           <layout class="QGridLayout" name="gridLayout_7">
-            <item row="0" column="0">
-             <widget class="SQLTableForm" name="statusSQLTableWidget" native="true">
-              <property name="minimumSize">
-               <size>
-                <width>0</width>
-                <height>200</height>
-               </size>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </widget>
-          <widget class="QWidget" name="tab_stock_edit">
-           <attribute name="title">
-            <string>Stockage</string>
-           </attribute>
-           <layout class="QGridLayout" name="gridLayout_6">
-            <item row="0" column="0">
-             <widget class="SQLTableForm" name="editStockageSqlTableWidget" native="true">
-              <property name="minimumSize">
-               <size>
-                <width>0</width>
-                <height>200</height>
-               </size>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </widget>
-         </widget>
-        </item>
         <item row="1" column="0">
          <layout class="QHBoxLayout" name="horizontalLayout_2">
           <property name="topMargin">
@@ -900,6 +778,128 @@
            </widget>
           </item>
          </layout>
+        </item>
+        <item row="0" column="0">
+         <widget class="QTabWidget" name="editTabWidget">
+          <property name="tabPosition">
+           <enum>QTabWidget::TabPosition::West</enum>
+          </property>
+          <property name="currentIndex">
+           <number>5</number>
+          </property>
+          <widget class="QWidget" name="Tab_comp_edit">
+           <attribute name="title">
+            <string>Stock de Composants</string>
+           </attribute>
+           <layout class="QGridLayout" name="gridLayout_10">
+            <item row="0" column="0">
+             <widget class="FilterTableView" name="vue_edition_composant" native="true"/>
+            </item>
+           </layout>
+          </widget>
+          <widget class="QWidget" name="tab_board_edit">
+           <attribute name="title">
+            <string>Cartes</string>
+           </attribute>
+           <layout class="QGridLayout" name="gridLayout_4">
+            <item row="0" column="0">
+             <widget class="FilterTableView" name="editBoardSqlTableWidget" native="true">
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>200</height>
+               </size>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+          <widget class="QWidget" name="tab_manuf_edit">
+           <attribute name="title">
+            <string>Fournisseurs</string>
+           </attribute>
+           <layout class="QGridLayout" name="gridLayout_9">
+            <item row="0" column="0">
+             <widget class="FilterTableView" name="editCompanySqlTableWidget" native="true">
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>200</height>
+               </size>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+          <widget class="QWidget" name="Contacts">
+           <attribute name="title">
+            <string>Contacts</string>
+           </attribute>
+           <layout class="QGridLayout" name="gridLayout_14">
+            <item row="0" column="0">
+             <widget class="FilterTableView" name="editContactSqlTableWidget" native="true">
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>200</height>
+               </size>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+          <widget class="QWidget" name="tab_fourn_edit">
+           <attribute name="title">
+            <string>Fabricants</string>
+           </attribute>
+           <layout class="QGridLayout" name="gridLayout_8">
+            <item row="0" column="0">
+             <widget class="FilterTableView" name="editManufacturerSqlTableWidget" native="true">
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>200</height>
+               </size>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+          <widget class="QWidget" name="tab_statut_edit">
+           <attribute name="title">
+            <string>Statut</string>
+           </attribute>
+           <layout class="QGridLayout" name="gridLayout_7">
+            <item row="0" column="0">
+             <widget class="FilterTableView" name="statusSQLTableWidget" native="true">
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>200</height>
+               </size>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+          <widget class="QWidget" name="tab_stock_edit">
+           <attribute name="title">
+            <string>Stockage</string>
+           </attribute>
+           <layout class="QGridLayout" name="gridLayout_6">
+            <item row="0" column="0">
+             <widget class="FilterTableView" name="editStockageSqlTableWidget" native="true">
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>200</height>
+               </size>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </widget>
         </item>
        </layout>
       </widget>
