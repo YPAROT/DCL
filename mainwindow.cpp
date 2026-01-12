@@ -86,10 +86,8 @@ void MainWindow::on_actionLoad_DCL_triggered()
     m_factory->attachView("Composants",ui->vue_edition_composant->getTableView());
     proxy = new ComponentProxyModel();
     m_factory->attachSortFilterProxyModel("Composants",ui->vue_edition_composant->getTableView()->objectName(),proxy);
-    //Vue normale
-    m_factory->attachView("Composants",ui->dclCompleteSqlTableWidget->getTableView());
-    proxy = new ComponentProxyModel();
-    m_factory->attachSortFilterProxyModel("Composants",ui->dclCompleteSqlTableWidget->getTableView()->objectName(),proxy);
+    //Connection des filtres au proxy
+    connect(ui->vue_edition_composant,&FilterTableView::filtersChanged,proxy,&ComponentProxyModel::setFilters);
     //delegates
     m_factory->setDelegate("Composants",ui->vue_edition_composant->getTableView()->objectName(),9,new ForeignKeyDelegate(this,"Manufacturer","Name","Manuf_ID",db));
     m_factory->setDelegate("Composants",ui->vue_edition_composant->getTableView()->objectName(),13,new OuiNonDelegate(this));
@@ -99,6 +97,22 @@ void MainWindow::on_actionLoad_DCL_triggered()
     m_factory->setDelegate("Composants",ui->vue_edition_composant->getTableView()->objectName(),19,new ForeignKeyDelegate(this,"Status","Status","ID",db));
     m_factory->setDelegate("Composants",ui->vue_edition_composant->getTableView()->objectName(),20,new DateDelegate(this));
     m_factory->setDelegate("Composants",ui->vue_edition_composant->getTableView()->objectName(),22,new ForeignKeyDelegate(this,"Stockage","Location","ID",db));
+    //Vue normale
+    m_factory->attachView("Composants",ui->dclCompleteSqlTableWidget->getTableView());
+    proxy = new ComponentProxyModel();
+    m_factory->attachSortFilterProxyModel("Composants",ui->dclCompleteSqlTableWidget->getTableView()->objectName(),proxy);
+    //Connection des filtres au proxy
+    connect(ui->dclCompleteSqlTableWidget,&FilterTableView::filtersChanged,proxy,&ComponentProxyModel::setFilters);
+    //delegates
+    m_factory->setDelegate("Composants",ui->dclCompleteSqlTableWidget->getTableView()->objectName(),9,new ForeignKeyDelegate(this,"Manufacturer","Name","Manuf_ID",db));
+    m_factory->setDelegate("Composants",ui->dclCompleteSqlTableWidget->getTableView()->objectName(),13,new OuiNonDelegate(this));
+    m_factory->setDelegate("Composants",ui->dclCompleteSqlTableWidget->getTableView()->objectName(),14,new ForeignKeyDelegate(this,"Procurement Company","Name","Proc_ID",db));
+    m_factory->setDelegate("Composants",ui->dclCompleteSqlTableWidget->getTableView()->objectName(),15,new OuiNonDelegate(this));
+    m_factory->setDelegate("Composants",ui->dclCompleteSqlTableWidget->getTableView()->objectName(),17,new OuiNonDelegate(this));
+    m_factory->setDelegate("Composants",ui->dclCompleteSqlTableWidget->getTableView()->objectName(),19,new ForeignKeyDelegate(this,"Status","Status","ID",db));
+    m_factory->setDelegate("Composants",ui->dclCompleteSqlTableWidget->getTableView()->objectName(),20,new DateDelegate(this));
+    m_factory->setDelegate("Composants",ui->dclCompleteSqlTableWidget->getTableView()->objectName(),22,new ForeignKeyDelegate(this,"Stockage","Location","ID",db));
+
 
 
 

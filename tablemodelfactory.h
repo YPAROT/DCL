@@ -50,7 +50,8 @@ public:
     // Définit un délégué personnalisé pour une colonne spécifique d'un modèle
     void setDelegate(const QString &tableName, const QString &viewName, int column, ProxyDelegate *delegate);
 
-    void setDelegateForAllViews(const QString &tableName, int column, ProxyDelegate *delegate);
+    //La fonction suivante ne peut pas marcher car il faudrait réaliser une copie pour laquelle il faudrait tester la classe dérivée... trop complexe pour peu de gain
+    // void setDelegateForAllViews(const QString &tableName, int column, ProxyDelegate *delegate);
 
     // Définit une relation pour une colonne d'un modèle
     void setRelation(const QString &tableName, int column, const QSqlRelation &relation);

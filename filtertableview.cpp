@@ -30,6 +30,10 @@ FilterTableView::FilterTableView(QWidget *parent)
 
     //actions sur la vue
 
+    //connections des signaux
+    m_filter_refresh_timer = new QTimer(this);
+    connect(m_filter_refresh_timer,&QTimer::timeout,this,&FilterTableView::filterRefreshTickTrigger);
+
 }
 
 FilterTableView::~FilterTableView()
@@ -40,6 +44,23 @@ FilterTableView::~FilterTableView()
 QTableView *FilterTableView::getTableView() const
 {
     return ui->sqlTable;
+}
+
+void FilterTableView::oneFilterJustChanged()
+{
+    m_filter_refresh_timer->start(500); //refresh de 500ms
+}
+
+void FilterTableView::filterRefreshTickTrigger()
+{
+    m_filter_refresh_timer->stop(); //arrêt du timer
+    //récupération des filtres
+    QStringList filters;
+    for(QLineEdit* filter_edit : std::as_const(m_filters_edit))
+    {
+        filters<<filter_edit->text();
+    }
+    emit filtersChanged(filters);
 }
 
 void FilterTableView::sqlModelChanged(QAbstractItemModel* model)
@@ -68,7 +89,7 @@ void FilterTableView::sqlModelChanged(QAbstractItemModel* model)
         QLineEdit *lineEditor = new QLineEdit(this);
         lineEditor->setPlaceholderText(QString("filtre"));
         m_filters_edit.append(lineEditor);
-        //connect(lineEditor, SIGNAL(textChanged(QString)), this, SLOT(lineEditorJustChanged()));
+        connect(lineEditor, &QLineEdit::textChanged, this, &FilterTableView::oneFilterJustChanged);
         ui->filterTable->setCellWidget(0, i, lineEditor);
     }
 

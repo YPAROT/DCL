@@ -320,33 +320,33 @@ void TableModelFactory::setDelegate(const QString &tableName, const QString &vie
 
 }
 
-void TableModelFactory::setDelegateForAllViews(const QString &tableName, int column, ProxyDelegate *delegate)
-{
-    if (!m_models.contains(tableName)) {
-        qWarning() << "Modèle non trouvé pour la table" << tableName;
-        return;
-    }
+// void TableModelFactory::setDelegateForAllViews(const QString &tableName, int column, ProxyDelegate *delegate)
+// {
+//     if (!m_models.contains(tableName)) {
+//         qWarning() << "Modèle non trouvé pour la table" << tableName;
+//         return;
+//     }
 
-    //Si le modèle n'a pas de vues, le delegate sert à rien on ne le met pas
-    if(!m_views.contains(tableName))
-    {
-        qWarning() << "Pas de vues associées à cette table" << tableName;
-        return;
-    }
+//     //Si le modèle n'a pas de vues, le delegate sert à rien on ne le met pas
+//     if(!m_views.contains(tableName))
+//     {
+//         qWarning() << "Pas de vues associées à cette table" << tableName;
+//         return;
+//     }
 
-    for (QTableView *view : m_views[tableName])
-    {
-        ProxyDelegate* delegate_copy = new ProxyDelegate(delegate);
-        QPair<QString,QString> key = QPair<QString,QString>(tableName,view->objectName());
-        // Stocke le délégué pour la colonne spécifiée
-        m_delegates[key][column] = delegate_copy;
-        if(m_proxies.contains(key))
-            delegate_copy->setProxy(m_proxies[key]);
-        view->setItemDelegateForColumn(column, delegate_copy);
-    }
+//     for (QTableView *view : m_views[tableName])
+//     {
+//         ProxyDelegate* delegate_copy = new ProxyDelegate(delegate);
+//         QPair<QString,QString> key = QPair<QString,QString>(tableName,view->objectName());
+//         // Stocke le délégué pour la colonne spécifiée
+//         m_delegates[key][column] = delegate_copy;
+//         if(m_proxies.contains(key))
+//             delegate_copy->setProxy(m_proxies[key]);
+//         view->setItemDelegateForColumn(column, delegate_copy);
+//     }
 
-    delete delegate;
-}
+//     delete delegate;
+// }
 
 void TableModelFactory::setRelation(const QString &tableName, int column, const QSqlRelation &relation)
 {

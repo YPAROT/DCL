@@ -5,6 +5,7 @@
 #include <QTableView>
 #include <QList>
 #include <QLineEdit>
+#include <QTimer>
 
 namespace Ui {
 class FilterTableView;
@@ -21,13 +22,22 @@ public:
     QTableView* getTableView() const;
 
 
+signals:
+
+    void filtersChanged(QStringList filters);
+
+
 protected slots:
 
+    void oneFilterJustChanged();
+    void filterRefreshTickTrigger();
     void sqlModelChanged(QAbstractItemModel* model);
+
 
 private:
     Ui::FilterTableView *ui;
     QList<QLineEdit*> m_filters_edit;
+    QTimer* m_filter_refresh_timer;
 };
 
 #endif // FILTERTABLEVIEW_H
