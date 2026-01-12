@@ -78,7 +78,7 @@ void MainWindow::on_actionLoad_DCL_triggered()
     m_factory->createModel("Composants",db);
     m_factory->attachView("Composants",ui->vue_edition_composant->getTableView());
     ComponentProxyModel* proxy = new ComponentProxyModel();
-    proxy->setDynamicSortFilter(true);
+    //proxy->setDynamicSortFilter(true);
     m_factory->attachSortFilterProxyModel("Composants",ui->vue_edition_composant->getTableView()->objectName(),proxy);
     m_factory->setDelegate("Composants",9,new ForeignKeyDelegate(this,"Manufacturer","Name","Manuf_ID",db));
     m_factory->setDelegate("Composants",13,new OuiNonDelegate(this));

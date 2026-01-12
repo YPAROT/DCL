@@ -41,7 +41,7 @@ void OuiNonDelegate::setModelData(QWidget *editor, QAbstractItemModel *model, co
     if (!comboBox) return;
 
     //On récupère le bon index si il y a un proxy
-    QModelIndex source_index = m_proxy ? m_proxy->mapToSource(index) : index;
+    //QModelIndex source_index = m_proxy ? m_proxy->mapToSource(index) : index;
 
     int currentIndex = comboBox->currentIndex();
     QVariant value;
@@ -53,7 +53,7 @@ void OuiNonDelegate::setModelData(QWidget *editor, QAbstractItemModel *model, co
         value = false; // "Non"
     }
 
-    model->setData(source_index, value, Qt::EditRole);
+    model->setData(index, value, Qt::EditRole);
 }
 
 void OuiNonDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const

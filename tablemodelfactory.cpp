@@ -85,14 +85,25 @@ void TableModelFactory::attachSortFilterProxyModel(const QString &tableName, con
 
     proxy->setSourceModel(m_models[tableName]);
     vue_trouvee->setModel(proxy);
-    m_proxies[viewName]=proxy;
+
+    //Génération de la clef
+    QPair<QString,QString> key = QPair<QString,QString>(tableName,vue_trouvee->objectName());
 
     //On prévient les delegates
-    auto delegate_map = m_delegates[tableName];
-    for(ProxyDelegate* delegate : delegate_map)
+    auto delegates = m_delegates[key];
+    for(auto delegate : delegates)
     {
         delegate->setProxy(proxy);
     }
+
+    //Si il y avait un proxy on l'efface
+    if(m_proxies.contains(key))
+    {
+        delete m_proxies[key];
+    }
+
+    m_proxies[key]=proxy;
+
 
     //La vue peut recommencer à se rafraîchir
     vue_trouvee->setUpdatesEnabled(true);
@@ -122,8 +133,11 @@ void TableModelFactory::detachSortFilterProxyModel(const QString &tableName, con
     //Pas de vue trouvée
     if(vue_trouvee == nullptr) return;
 
+    //Génération de la clef
+    QPair<QString,QString> key = QPair<QString,QString>(tableName,vue_trouvee->objectName());
+
     //La vue ne possède pas de proxy
-    if (!m_proxies.contains(viewName)) return;
+    if (!m_proxies.contains(key)) return;
 
     //On empêche la vue de se rafraîchir
     vue_trouvee->setUpdatesEnabled(false);
@@ -131,14 +145,16 @@ void TableModelFactory::detachSortFilterProxyModel(const QString &tableName, con
     //On enlève le proxy
     vue_trouvee->setModel(m_models[tableName]);
     //On prévient les delegates
-    auto delegate_map = m_delegates[tableName];
-    for(ProxyDelegate* delegate : delegate_map)
+    auto delegates = m_delegates[key];
+    for(auto delegate : delegates)
     {
-        delegate->setProxy(nullptr);
+         delegate->setProxy(nullptr);
     }
+
+
     //on peut effacer le proxy
-    delete m_proxies[viewName];
-    m_proxies.remove(viewName);
+    delete m_proxies[key];
+    m_proxies.remove(key);
 
     //La vue peut recommencer à se rafraîchir
     vue_trouvee->setUpdatesEnabled(true);
@@ -157,20 +173,23 @@ void TableModelFactory::detachAllSortFilterProxyModel()
             //On empêche la vue de se rafraîchir
             view->setUpdatesEnabled(false);
 
-            QString view_name = view->objectName();
-            if (m_proxies.contains(view_name))
+            //Génération de la clef
+            QPair<QString,QString> key = QPair<QString,QString>(it.key(),view->objectName());
+
+            //QString view_name = view->objectName();
+            if (m_proxies.contains(key))
             {
-                view->setModel(m_proxies[view_name]->sourceModel());
+                view->setModel(m_proxies[key]->sourceModel());
 
                 //on prévient les delegates
-                auto delegate_map = m_delegates[retrieveTableNameFromView(view)];
-                for(ProxyDelegate* delegate : std::as_const(delegate_map))
+                auto delegates = m_delegates[key];
+                for(auto delegate : delegates)
                 {
-                    delegate->setProxy(nullptr); // On fait le job plusieurs fois. Autre soucis les delegates sont uniques par modèles et non par vues.... Revoir philo des delegates!!! Un doit être créé par vue.
+                    delegate->setProxy(nullptr);
                 }
 
-                delete m_proxies[view_name];
-                m_proxies.remove(view_name); //On pourrait faire un clear de la liste à la fin mais je préfère faire au fur et à mesure
+                delete m_proxies[key];
+                m_proxies.remove(key); //On pourrait faire un clear de la liste à la fin mais je préfère faire au fur et à mesure
             }
 
             //La vue peut recommencer à se rafraîchir
@@ -209,16 +228,22 @@ void TableModelFactory::clearModel(const QString &tableName)
 {
     if (m_views.contains(tableName)) {
         for (QTableView *view : m_views[tableName]) {
+            //On enlève les proxies
             detachSortFilterProxyModel(tableName,view->objectName());
+            //Génération de la clef
+            QPair<QString,QString> key = QPair<QString,QString>(tableName,view->objectName());
+            //on efface les delegates
+            auto delegates = m_delegates[key];
+            for(auto delegate : delegates)
+            {
+                delete delegate;
+            }
+            m_delegates.remove(key);
             view->setModel(nullptr);
         }
         m_views.remove(tableName);
     }
 
-    if (m_delegates.contains(tableName)) {
-        qDeleteAll(m_delegates[tableName]);
-        m_delegates.remove(tableName);
-    }
 
     if (m_models.contains(tableName)) {
         delete m_models[tableName];
@@ -252,18 +277,23 @@ void TableModelFactory::setDelegate(const QString &tableName, int column, ProxyD
         return;
     }
 
-    // Stocke le délégué pour la colonne spécifiée
-    m_delegates[tableName][column] = delegate;
-
-    // Applique le délégué à toutes les vues associées au modèle
-    if (m_views.contains(tableName)) {
-        for (QTableView *view : m_views[tableName]) {
-            //Si il y a un proxy on l'applique au délégué
-            if(m_proxies.contains(view->objectName()))
-                delegate->setProxy(m_proxies[view->objectName()]);
-            view->setItemDelegateForColumn(column, delegate);
-        }
+    //Si le modèle n'a pas de vues, le delegate sert à rien on ne le met pas
+    if(!m_views.contains(tableName))
+    {
+        qWarning() << "Pas de vues associées à cette table" << tableName;
+        return;
     }
+
+    for (QTableView *view : m_views[tableName])
+    {
+        QPair<QString,QString> key = QPair<QString,QString>(tableName,view->objectName());
+        // Stocke le délégué pour la colonne spécifiée
+        m_delegates[key][column] = delegate;
+        if(m_proxies.contains(key))
+            delegate->setProxy(m_proxies[key]);
+        view->setItemDelegateForColumn(column, delegate);
+    }
+
 }
 
 void TableModelFactory::setRelation(const QString &tableName, int column, const QSqlRelation &relation)

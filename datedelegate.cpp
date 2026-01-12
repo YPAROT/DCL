@@ -31,11 +31,11 @@ void DateDelegate::setEditorData(QWidget* editor, const QModelIndex& index) cons
 void DateDelegate::setModelData(QWidget* editor, QAbstractItemModel* model, const QModelIndex& index) const
 {
     //On récupère le bon index si il y a un proxy
-    QModelIndex source_index = m_proxy ? m_proxy->mapToSource(index) : index;
+    //QModelIndex source_index = m_proxy ? m_proxy->mapToSource(index) : index;
 
     QDateEdit* dateEdit = static_cast<QDateEdit*>(editor);
     QDate date = dateEdit->date();
-    model->setData(source_index, date.toString("dd/MM/yyyy"), Qt::EditRole);
+    model->setData(index, date.toString("dd/MM/yyyy"), Qt::EditRole);
 }
 
 void DateDelegate::paint(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const

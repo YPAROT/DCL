@@ -10,6 +10,9 @@
 #include <QSortFilterProxyModel>
 #include "proxydelegate.h"
 
+
+//Définition de la classe TableModelFactory permettant de créer les modèles à partir de la DB,
+//D'y associer des vues, des délégués, des proxys etc..
 class TableModelFactory : public QObject
 {
     Q_OBJECT
@@ -57,10 +60,10 @@ private:
     QString retrieveTableNameFromView(QTableView* view);
 
 private:
-    using ModelMap = QMap<QString, QSqlRelationalTableModel*>;
-    using ViewMap = QMap<QString, QList<QTableView*>>;
-    using DelegateMap = QMap<QString, QMap<int, ProxyDelegate *>>;
-    using ProxyMap = QMap<QString,QSortFilterProxyModel*>;
+    using ModelMap = QMap<QString, QSqlRelationalTableModel*>; //La clef est le nom de la table
+    using ViewMap = QMap<QString, QList<QTableView*>>; //La clef est le nom de la table
+    using DelegateMap = QMap<QPair<QString,QString>,QMap<int,ProxyDelegate*>>; // la clef est tablename,viewname. Le int design la colonne associé au delegate
+    using ProxyMap = QMap<QPair<QString,QString>,QSortFilterProxyModel*>; // la clef est tablename,viewname.
 
     ModelMap m_models;
     ViewMap m_views;

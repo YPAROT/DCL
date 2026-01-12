@@ -59,11 +59,12 @@ void ForeignKeyDelegate::setModelData(QWidget *editor, QAbstractItemModel *model
     if (!comboBox) return;
 
     //On récupère le bon index si il y a un proxy
-    QModelIndex source_index = m_proxy ? m_proxy->mapToSource(index) : index;
+    //QModelIndex source_index = m_proxy ? m_proxy->mapToSource(index) : index;
+
     // Récupère l'ID sélectionné
     int foreignKey = comboBox->currentData().toInt();
     // Met à jour le modèle avec la nouvelle valeur
-    model->setData(source_index, foreignKey, Qt::EditRole);
+    model->setData(index, foreignKey, Qt::EditRole);
 }
 
 void ForeignKeyDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
