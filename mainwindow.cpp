@@ -10,7 +10,12 @@ MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
 {
+    //Mise en place des objets graphiques
     ui->setupUi(this);
+
+    //Renommage des vues afin de les rendre unique. (Non unicité du fait de la promotion de certains widgets en FilterTableView)
+    qDebug()<<"Non unique donné:"<<setUniqueUIName(ui->vue_edition_composant->getTableView());
+    qDebug()<<"Non unique donné:"<<setUniqueUIName(ui->dclCompleteSqlTableWidget->getTableView());
 
     //initialisation du timer vérifiant l'état de la db
     p_timer_db_valid = new QTimer(this);
@@ -74,20 +79,28 @@ void MainWindow::on_actionLoad_DCL_triggered()
     }
 
     //Création des modèles et rattachement aux vues via la factory
+    ComponentProxyModel* proxy;
     //-> Table Composants
     m_factory->createModel("Composants",db);
+    //Vue edition
     m_factory->attachView("Composants",ui->vue_edition_composant->getTableView());
-    ComponentProxyModel* proxy = new ComponentProxyModel();
-    //proxy->setDynamicSortFilter(true);
+    proxy = new ComponentProxyModel();
     m_factory->attachSortFilterProxyModel("Composants",ui->vue_edition_composant->getTableView()->objectName(),proxy);
-    m_factory->setDelegate("Composants",9,new ForeignKeyDelegate(this,"Manufacturer","Name","Manuf_ID",db));
-    m_factory->setDelegate("Composants",13,new OuiNonDelegate(this));
-    m_factory->setDelegate("Composants",14,new ForeignKeyDelegate(this,"Procurement Company","Name","Proc_ID",db));
-    m_factory->setDelegate("Composants",15,new OuiNonDelegate(this));
-    m_factory->setDelegate("Composants",17,new OuiNonDelegate(this));
-    m_factory->setDelegate("Composants",19,new ForeignKeyDelegate(this,"Status","Status","ID",db));
-    m_factory->setDelegate("Composants",20,new DateDelegate(this));
-    m_factory->setDelegate("Composants",22,new ForeignKeyDelegate(this,"Stockage","Location","ID",db));
+    //Vue normale
+    m_factory->attachView("Composants",ui->dclCompleteSqlTableWidget->getTableView());
+    proxy = new ComponentProxyModel();
+    m_factory->attachSortFilterProxyModel("Composants",ui->dclCompleteSqlTableWidget->getTableView()->objectName(),proxy);
+    //delegates
+    m_factory->setDelegate("Composants",ui->vue_edition_composant->getTableView()->objectName(),9,new ForeignKeyDelegate(this,"Manufacturer","Name","Manuf_ID",db));
+    m_factory->setDelegate("Composants",ui->vue_edition_composant->getTableView()->objectName(),13,new OuiNonDelegate(this));
+    m_factory->setDelegate("Composants",ui->vue_edition_composant->getTableView()->objectName(),14,new ForeignKeyDelegate(this,"Procurement Company","Name","Proc_ID",db));
+    m_factory->setDelegate("Composants",ui->vue_edition_composant->getTableView()->objectName(),15,new OuiNonDelegate(this));
+    m_factory->setDelegate("Composants",ui->vue_edition_composant->getTableView()->objectName(),17,new OuiNonDelegate(this));
+    m_factory->setDelegate("Composants",ui->vue_edition_composant->getTableView()->objectName(),19,new ForeignKeyDelegate(this,"Status","Status","ID",db));
+    m_factory->setDelegate("Composants",ui->vue_edition_composant->getTableView()->objectName(),20,new DateDelegate(this));
+    m_factory->setDelegate("Composants",ui->vue_edition_composant->getTableView()->objectName(),22,new ForeignKeyDelegate(this,"Stockage","Location","ID",db));
+
+
 
     //select sur toutes les tables contenues dans la factory
     m_factory->selectOnAllModels();
@@ -277,5 +290,32 @@ void MainWindow::on_actionFermer_une_DCL_triggered()
     db.close();
 
     m_factory->clearAllModels();
+}
+
+QString MainWindow::getUniqueUIName(QWidget *widget) const
+{
+    {
+        QString unique_name = widget->objectName();
+        QWidget *current_widget = widget;
+        while(current_widget->parentWidget()!=nullptr)
+        {
+            unique_name.prepend(current_widget->parentWidget()->objectName());
+            current_widget = current_widget->parentWidget();
+        }
+
+        return unique_name;
+    }
+}
+
+QString MainWindow::setUniqueUIName(QWidget *widget) const
+{
+    QString unique_UI_name = getUniqueUIName(widget);
+
+    if(unique_UI_name == widget->objectName())
+        qWarning()<<"Le nom unique et le nom original de l'objet sont les mêmes. Attention le nom unique ne l'est peut-être pas";
+
+    widget->setObjectName(unique_UI_name);
+
+    return unique_UI_name;
 }
 

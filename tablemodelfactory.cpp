@@ -270,7 +270,57 @@ bool TableModelFactory::selectOnModel(const QString &tableName)
     return false;
 }
 
-void TableModelFactory::setDelegate(const QString &tableName, int column, ProxyDelegate *delegate)
+void TableModelFactory::setDelegate(const QString &tableName, const QString &viewName, int column, ProxyDelegate *delegate)
+{
+    if (!m_models.contains(tableName)) {
+        qWarning() << "Modèle non trouvé pour la table" << tableName;
+        return;
+    }
+
+    //Si le modèle n'a pas de vues, le delegate sert à rien on ne le met pas
+    if(!m_views.contains(tableName))
+    {
+        qWarning() << "Pas de vues associées à cette table" << tableName;
+        return;
+    }
+
+    //existance de la vue
+    QTableView* vue_trouvee = nullptr;
+    for(QTableView* current_obj : m_views[tableName])
+    {
+        if(current_obj->objectName() == viewName)
+        {
+            vue_trouvee = current_obj;
+            break;
+        }
+    }
+
+    //Pas de vue trouvée
+    if(vue_trouvee == nullptr) return;
+
+    //Génération de la clef
+    QPair<QString,QString> key = QPair<QString,QString>(tableName,vue_trouvee->objectName());
+
+    delegate->setProxy(m_proxies[key]);
+
+
+    //ajout du delegate
+    vue_trouvee->setItemDelegateForColumn(column, delegate);
+
+
+    // for (QTableView *view : m_views[tableName])
+    // {
+    //     QPair<QString,QString> key = QPair<QString,QString>(tableName,view->objectName());
+    //     // Stocke le délégué pour la colonne spécifiée
+    //     m_delegates[key][column] = delegate;
+    //     if(m_proxies.contains(key))
+    //         delegate->setProxy(m_proxies[key]);
+    //     view->setItemDelegateForColumn(column, delegate);
+    // }
+
+}
+
+void TableModelFactory::setDelegateForAllViews(const QString &tableName, int column, ProxyDelegate *delegate)
 {
     if (!m_models.contains(tableName)) {
         qWarning() << "Modèle non trouvé pour la table" << tableName;
@@ -286,14 +336,16 @@ void TableModelFactory::setDelegate(const QString &tableName, int column, ProxyD
 
     for (QTableView *view : m_views[tableName])
     {
+        ProxyDelegate* delegate_copy = new ProxyDelegate(delegate);
         QPair<QString,QString> key = QPair<QString,QString>(tableName,view->objectName());
         // Stocke le délégué pour la colonne spécifiée
-        m_delegates[key][column] = delegate;
+        m_delegates[key][column] = delegate_copy;
         if(m_proxies.contains(key))
-            delegate->setProxy(m_proxies[key]);
-        view->setItemDelegateForColumn(column, delegate);
+            delegate_copy->setProxy(m_proxies[key]);
+        view->setItemDelegateForColumn(column, delegate_copy);
     }
 
+    delete delegate;
 }
 
 void TableModelFactory::setRelation(const QString &tableName, int column, const QSqlRelation &relation)
