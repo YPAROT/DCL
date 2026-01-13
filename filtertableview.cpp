@@ -9,25 +9,37 @@ FilterTableView::FilterTableView(QWidget *parent)
     ui->setupUi(this);
 
     //Paramètre par défaut des tables
-
-    //On cache les barre de scrolling de la table de filtre
-    ui->filterTable->horizontalScrollBar()->hide();
-    ui->filterTable->verticalScrollBar()->hide();
+    //--> Scrolling commun
     //Barres de scrolling sur sqltable
     ui->sqlTable->horizontalScrollBar()->setVisible(true);
     ui->sqlTable->verticalScrollBar()->setVisible(true);
+    //On cache les barre de scrolling de la table de filtre
+    ui->filterTable->horizontalScrollBar()->hide();
+    ui->filterTable->verticalScrollBar()->hide();
+    //Synchronisation des scrollbar horizontales (de sqlTable vers filterTable)
+    connect(ui->sqlTable->horizontalScrollBar(), &QScrollBar::valueChanged, ui->filterTable->horizontalScrollBar(),&QScrollBar::setValue );
+
+    //--> Header horizontaux communs
     //Les headers horizontaux sont reportés sur les filtres
+    ui->filterTable->horizontalHeader()->setVisible(true);
+    ui->filterTable->horizontalHeader()->setStretchLastSection(true);// On remplit toute la fenêtre
     ui->sqlTable->horizontalHeader()->hide();
     ui->sqlTable->horizontalHeader()->setStretchLastSection(true); // On remplit toute la fenêtre
     connect(ui->sqlTable,&CustomTableView::modelChanged,this,&FilterTableView::sqlModelChanged);
+    connect(ui->filterTable->horizontalHeader(),&QHeaderView::sortIndicatorChanged,ui->sqlTable->horizontalHeader(),&QHeaderView::setSortIndicator);
+    connect(ui->filterTable->horizontalHeader(),&QHeaderView::sectionResized,this,&FilterTableView::filterTableHeaderSectionResized);
+
     //les headers verticaux sont cachés
     ui->sqlTable->verticalHeader()->hide();
     ui->filterTable->verticalHeader()->hide();
     //dimension max de la taille des filtres
-    ui->filterTable->setMaximumHeight(60); //(30 pour Header + 30 pour filtre)
+    ui->filterTable->setMaximumHeight(70); //(30 pour Header + 40 pour filtre)
     //Possibilité de trier par colonne
     ui->sqlTable->setSortingEnabled(true);
     ui->filterTable->setSortingEnabled(false);
+
+
+
 
 
     //actions sur la vue
@@ -85,16 +97,31 @@ void FilterTableView::sqlModelChanged(QAbstractItemModel* model)
         //On libère la mémoire
         qDeleteAll(m_filters_edit);
     }
-    //On effece la liste maintenant que la mémoire est libérée
+    //On efface la liste maintenant que la mémoire est libérée
     m_filters_edit.clear();
+
+    //resize des éléments et donc des headers
+    ui->sqlTable->resizeColumnsToContents();
+    ui->sqlTable->resizeRowsToContents();
 
     //mise en place du bon nombre de colonnes
     int column_count = model->columnCount();
     ui->filterTable->setColumnCount(column_count);
 
     //Mise en place des headers
-    ui->filterTable->setHorizontalHeader(ui->sqlTable->horizontalHeader());
-    ui->filterTable->horizontalHeader()->setVisible(true); //Les headers copiés sont setvisible(false)
+    //On empêche la mise à jour de se refaire dans l'autre sens pour éviter les boucles infinies
+    ui->sqlTable->blockSignals(true);
+    QStringList header_labels;
+    for (int i = 0; i < column_count; ++i)
+    {
+        ui->filterTable->setColumnWidth(i, ui->sqlTable->columnWidth(i));
+        header_labels<<model->headerData(i,Qt::Horizontal).toString();
+
+    }
+    ui->filterTable->setHorizontalHeaderLabels(header_labels);
+    ui->sqlTable->blockSignals(false);
+    // ui->filterTable->setHorizontalHeader(ui->sqlTable->horizontalHeader());
+    // ui->filterTable->horizontalHeader()->setVisible(true); //Les headers copiés sont setvisible(false)
 
     //ajout des filtres
     ui->filterTable->setRowCount(1);
@@ -108,13 +135,10 @@ void FilterTableView::sqlModelChanged(QAbstractItemModel* model)
         ui->filterTable->setCellWidget(0, i, lineEditor);
     }
 
-    qDebug()<<"Objet "<<objectName()<<" possède "<<m_filters_edit.count()<<" filtres\n\n";
 
-    //réajustement de la hauteur du header
-    int height = ui->filterTable->horizontalHeader()->height()
-                 + ui->filterTable->rowHeight(0) + 4;
+}
 
-    // qDebug()<<"Objet "<<objectName()<<":\nTaille header: "<<ui->filterTable->horizontalHeader()->height()<<"\nTaille première ligne: "<<ui->filterTable->rowHeight(0)<<"\n";
-    // qDebug()<<"Taille d'un line edit: "<<ui->filterTable->cellWidget(0,0)->height()<<"\n\n";
-    ui->filterTable->setMaximumHeight(height);
+void FilterTableView::filterTableHeaderSectionResized(int logicalIndex, int oldSize, int newSize)
+{
+    ui->sqlTable->setColumnWidth(logicalIndex,newSize);
 }

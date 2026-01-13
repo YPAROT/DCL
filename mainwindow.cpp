@@ -17,6 +17,9 @@ MainWindow::MainWindow(QWidget *parent)
     qDebug()<<"Non unique donné:"<<setUniqueUIName(ui->vue_edition_composant->getTableView());
     qDebug()<<"Non unique donné:"<<setUniqueUIName(ui->dclCompleteSqlTableWidget->getTableView());
 
+    //Rendre non éditable les vues de visualisation pures
+    ui->dclCompleteSqlTableWidget->getTableView()->setEditTriggers(QAbstractItemView::NoEditTriggers);
+
     //initialisation du timer vérifiant l'état de la db
     p_timer_db_valid = new QTimer(this);
     connect(p_timer_db_valid,&QTimer::timeout, this,&MainWindow::checkDBStatus);

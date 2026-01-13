@@ -32,6 +32,7 @@ protected slots:
     void oneFilterJustChanged();
     void filterRefreshTickTrigger();
     void sqlModelChanged(QAbstractItemModel* model);
+    void filterTableHeaderSectionResized(int logicalIndex, int oldSize, int newSize);
 
 
 private:
