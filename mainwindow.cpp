@@ -14,8 +14,9 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
 
     //Renommage des vues afin de les rendre unique. (Non unicité du fait de la promotion de certains widgets en FilterTableView)
-    qDebug()<<"Non unique donné:"<<setUniqueUIName(ui->vue_edition_composant->getTableView());
-    qDebug()<<"Non unique donné:"<<setUniqueUIName(ui->dclCompleteSqlTableWidget->getTableView());
+    // qDebug()<<"Non unique donné:"<<setUniqueUIName(ui->vue_edition_composant->getTableView());
+    // qDebug()<<"Non unique donné:"<<setUniqueUIName(ui->dclCompleteSqlTableWidget->getTableView());
+    setUniqueUINameforObjectType<QTableView>(this);
 
     //Rendre non éditable les vues de visualisation pures
     ui->dclCompleteSqlTableWidget->getTableView()->setEditTriggers(QAbstractItemView::NoEditTriggers);
@@ -369,10 +370,12 @@ QString MainWindow::getUniqueUIName(QWidget *widget) const
     {
         QString unique_name = widget->objectName();
         QWidget *current_widget = widget;
-        while(current_widget->parentWidget()!=nullptr)
+        int counter = 0;
+        while(current_widget->parentWidget()!=nullptr && counter<3)
         {
             unique_name.prepend(current_widget->parentWidget()->objectName());
             current_widget = current_widget->parentWidget();
+            counter++;
         }
 
         return unique_name;
@@ -386,8 +389,19 @@ QString MainWindow::setUniqueUIName(QWidget *widget) const
     if(unique_UI_name == widget->objectName())
         qWarning()<<"Le nom unique et le nom original de l'objet sont les mêmes. Attention le nom unique ne l'est peut-être pas";
 
+    qDebug()<<"Objet "<<widget->objectName()<<" renommé "<<unique_UI_name;
     widget->setObjectName(unique_UI_name);
 
     return unique_UI_name;
 }
 
+
+template<typename T>
+void MainWindow::setUniqueUINameforObjectType(QWidget *parent)
+{
+    QList<T*> objet_trouvés = parent->findChildren<T*>();
+    for(T* objet : objet_trouvés)
+    {
+        setUniqueUIName(objet);
+    }
+}

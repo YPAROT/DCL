@@ -24,6 +24,13 @@ public:
     ~MainWindow();
 
 
+    //Permet de créer un nom combiné parent/enfant pour rendre unique un QWidget généré par
+    // le fichier ui de QtCreator
+    QString getUniqueUIName(QWidget* widget) const;
+    QString setUniqueUIName(QWidget* widget) const;
+    template<typename T>
+    void setUniqueUINameforObjectType(QWidget* parent);
+
 private slots:
 
     void on_actionClose_triggered();
@@ -94,10 +101,7 @@ private slots:
 
     void on_actionFermer_une_DCL_triggered();
 
-    //Permet de créer un nom combiné parent/enfant pour rendre unique un QWidget généré par
-    // le fichier ui de QtCreator
-    QString getUniqueUIName(QWidget* widget) const;
-    QString setUniqueUIName(QWidget* widget) const;
+
 
 public slots:
     void checkDBStatus();

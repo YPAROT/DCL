@@ -39,10 +39,21 @@ FilterTableView::FilterTableView(QWidget *parent)
     ui->filterTable->setSortingEnabled(false);
 
 
-
-
-
     //actions sur la vue
+    if(ui->sqlTable->editTriggers() != QAbstractItemView::NoEditTriggers)
+    {
+        m_insert_row_action = new QAction("Insérer une ligne",ui->sqlTable);
+        ui->sqlTable->addAction(m_insert_row_action);
+
+        m_delete_row_action = new QAction("Effacer une ligne insérée",ui->sqlTable);
+        ui->sqlTable->addAction(m_delete_row_action);
+
+        m_commit_action = new QAction("Commit",ui->sqlTable);
+        ui->sqlTable->addAction(m_commit_action);
+
+        m_refresh_action = new QAction("Recharger la base de donnée",ui->sqlTable);
+        ui->sqlTable->addAction(m_refresh_action);
+    }
 
     //connections des signaux
     m_filter_refresh_timer = new QTimer(this);
@@ -103,6 +114,7 @@ void FilterTableView::sqlModelChanged(QAbstractItemModel* model)
     //resize des éléments et donc des headers
     ui->sqlTable->resizeColumnsToContents();
     ui->sqlTable->resizeRowsToContents();
+    ui->sqlTable->resizeColumnsToContents();
 
     //mise en place du bon nombre de colonnes
     int column_count = model->columnCount();
