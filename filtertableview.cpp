@@ -18,6 +18,7 @@ FilterTableView::FilterTableView(QWidget *parent)
     ui->sqlTable->verticalScrollBar()->setVisible(true);
     //Les headers horizontaux sont reportés sur les filtres
     ui->sqlTable->horizontalHeader()->hide();
+    ui->sqlTable->horizontalHeader()->setStretchLastSection(true); // On remplit toute la fenêtre
     connect(ui->sqlTable,&CustomTableView::modelChanged,this,&FilterTableView::sqlModelChanged);
     //les headers verticaux sont cachés
     ui->sqlTable->verticalHeader()->hide();
@@ -27,6 +28,7 @@ FilterTableView::FilterTableView(QWidget *parent)
     //Possibilité de trier par colonne
     ui->sqlTable->setSortingEnabled(true);
     ui->filterTable->setSortingEnabled(false);
+
 
     //actions sur la vue
 
@@ -70,6 +72,22 @@ void FilterTableView::sqlModelChanged(QAbstractItemModel* model)
         return;
     }
 
+    //Supression des anciens filtres
+    if(!m_filters_edit.isEmpty())
+    {
+        for(QLineEdit* lineEditor : std::as_const(m_filters_edit))
+        {
+            //déconnexion des signaux
+            disconnect(lineEditor,&QLineEdit::textChanged, this, &FilterTableView::oneFilterJustChanged);
+        }
+        //On enlève les lineedit du QWidget
+        ui->filterTable->clearContents();
+        //On libère la mémoire
+        qDeleteAll(m_filters_edit);
+    }
+    //On effece la liste maintenant que la mémoire est libérée
+    m_filters_edit.clear();
+
     //mise en place du bon nombre de colonnes
     int column_count = model->columnCount();
     ui->filterTable->setColumnCount(column_count);
@@ -81,9 +99,6 @@ void FilterTableView::sqlModelChanged(QAbstractItemModel* model)
     //ajout des filtres
     ui->filterTable->setRowCount(1);
 
-    //Supression des anciens filtres
-    m_filters_edit.clear();
-
     for (int i = 0; i < column_count; ++i)
     {
         QLineEdit *lineEditor = new QLineEdit(this);
@@ -93,10 +108,13 @@ void FilterTableView::sqlModelChanged(QAbstractItemModel* model)
         ui->filterTable->setCellWidget(0, i, lineEditor);
     }
 
+    qDebug()<<"Objet "<<objectName()<<" possède "<<m_filters_edit.count()<<" filtres\n\n";
+
     //réajustement de la hauteur du header
     int height = ui->filterTable->horizontalHeader()->height()
                  + ui->filterTable->rowHeight(0) + 4;
 
+    // qDebug()<<"Objet "<<objectName()<<":\nTaille header: "<<ui->filterTable->horizontalHeader()->height()<<"\nTaille première ligne: "<<ui->filterTable->rowHeight(0)<<"\n";
+    // qDebug()<<"Taille d'un line edit: "<<ui->filterTable->cellWidget(0,0)->height()<<"\n\n";
     ui->filterTable->setMaximumHeight(height);
-
 }
