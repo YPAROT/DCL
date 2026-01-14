@@ -2,6 +2,9 @@
 #include "ui_filtertableview.h"
 #include <QScrollBar>
 #include <QSqlRelationalTableModel>
+#include <QMessageBox>
+#include <QSqlError>
+
 #include "componenttablemodel.h"
 #include "customrelationalmodel.h"
 #include "customsortfilterproxymodel.h"
@@ -50,20 +53,20 @@ FilterTableView::FilterTableView(QWidget *parent)
         QAction* m_insert_row_action = new QAction("Insérer une ligne",ui->sqlTable);
         ui->sqlTable->addAction(m_insert_row_action);
 
-        QAction* m_copy_row_action = new QAction("Copier une ligne",ui->sqlTable);
+        QAction* m_copy_row_action = new QAction("Copier la ligne",ui->sqlTable);
         ui->sqlTable->addAction(m_copy_row_action);
 
-        QAction* m_paste_row_action = new QAction("Coller une ligne",ui->sqlTable);
+        QAction* m_paste_row_action = new QAction("Insérer la ligne copiée",ui->sqlTable);
         ui->sqlTable->addAction(m_paste_row_action);
 
-        QAction* m_delete_row_action = new QAction("Effacer une ligne insérée",ui->sqlTable);
+        QAction* m_delete_row_action = new QAction("Effacer les lignes sélectionnées",ui->sqlTable);
         ui->sqlTable->addAction(m_delete_row_action);
-
-        QAction* m_commit_action = new QAction("Commit",ui->sqlTable);
-        ui->sqlTable->addAction(m_commit_action);
 
         QAction* m_revert_rows_action = new QAction("Annuler les changements sur les lignes sélectionnées",ui->sqlTable);
         ui->sqlTable->addAction(m_revert_rows_action);
+
+        QAction* m_commit_action = new QAction("Commit",ui->sqlTable);
+        ui->sqlTable->addAction(m_commit_action);
 
         QAction* m_refresh_action = new QAction("Recharger la base de donnée",ui->sqlTable);
         ui->sqlTable->addAction(m_refresh_action);
@@ -215,25 +218,83 @@ void FilterTableView::pasteRow()
 
 void FilterTableView::deleteRow()
 {
+    //Est-ce un proxy?
+    QAbstractItemModel* model = ui->sqlTable->model();
+    CustomSortFilterProxyModel* proxy = dynamic_cast<CustomSortFilterProxyModel*>(model);
+    if(proxy)
+    {
+        qDebug()<<"Proxy attaché à la vue";
+        model = proxy->sourceModel();
+    }
 
+    QSqlRelationalTableModel* source_model = dynamic_cast<QSqlRelationalTableModel*>(model);
+    if(!source_model)
+    {
+        qWarning()<<"Cast raté sur le modèle "<<model;
+        return;
+    }
+
+    QModelIndexList selected_rows = ui->sqlTable->selectionModel()->selectedIndexes();
+    for(QModelIndex index : std::as_const(selected_rows))
+    {
+        if(index.isValid())
+        {
+            source_model->removeRow(index.row());
+        }
+    }
 }
 
 void FilterTableView::commit()
 {
+    //Est-ce un proxy?
+    QAbstractItemModel* model = ui->sqlTable->model();
+    CustomSortFilterProxyModel* proxy = dynamic_cast<CustomSortFilterProxyModel*>(model);
+    if(proxy)
+    {
+        qDebug()<<"Proxy attaché à la vue";
+        model = proxy->sourceModel();
+    }
 
+    //Commit
+    QSqlRelationalTableModel* source_model = static_cast<QSqlRelationalTableModel*>(model);
+    if(!source_model)
+    {
+        qWarning()<<"Cast raté sur le modèle "<<model;
+        return;
+    }
+
+    if(!source_model->submitAll())
+    {
+        QMessageBox::warning(this, "Comit failure", source_model->lastError().text());
+    }
 }
 
 void FilterTableView::revertRows()
 {
-    // QSqlRelationalTableModel* model = static_cast<QSqlRelationalTableModel*>(ui->sqlTable->model());
-    // QModelIndexList selected_rows = ui->sqlTable->selectionModel()->selectedRows();
-    // for(QModelIndex index : std::as_const(selected_rows))
-    // {
-    //     if(index.isValid())
-    //     {
-    //         model->revertRow(index.row());
-    //     }
-    // }
+    //Est-ce un proxy?
+    QAbstractItemModel* model = ui->sqlTable->model();
+    CustomSortFilterProxyModel* proxy = dynamic_cast<CustomSortFilterProxyModel*>(model);
+    if(proxy)
+    {
+        qDebug()<<"Proxy attaché à la vue";
+        model = proxy->sourceModel();
+    }
+
+    QSqlRelationalTableModel* source_model = dynamic_cast<QSqlRelationalTableModel*>(model);
+    if(!source_model)
+    {
+        qWarning()<<"Cast raté sur le modèle "<<model;
+        return;
+    }
+
+    QModelIndexList selected_rows = ui->sqlTable->selectionModel()->selectedIndexes();
+    for(QModelIndex index : std::as_const(selected_rows))
+    {
+        if(index.isValid())
+        {
+            source_model->revertRow(index.row());
+        }
+    }
 }
 
 void FilterTableView::refresh()
