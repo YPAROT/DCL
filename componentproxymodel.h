@@ -1,21 +1,16 @@
 #ifndef COMPONENTPROXYMODEL_H
 #define COMPONENTPROXYMODEL_H
 
-#include <QSortFilterProxyModel>
+#include "customsortfilterproxymodel.h"
 
-class ComponentProxyModel : public QSortFilterProxyModel
+class ComponentProxyModel : public CustomSortFilterProxyModel
 {
     Q_OBJECT
 public:
     explicit ComponentProxyModel(QObject *parent = nullptr);
 
-public slots:
-
-    void setFilters(QStringList filters);
-
 protected:
-    bool lessThan(const QModelIndex &left, const QModelIndex &right) const override;
-    bool filterAcceptsRow(int source_row, const QModelIndex &source_parent) const override;
+    virtual bool lessThan(const QModelIndex &left, const QModelIndex &right) const override;
 
 private:
     QStringList m_filters;

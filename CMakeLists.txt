@@ -50,6 +50,7 @@ qt_add_executable(GenericDCL WIN32 MACOSX_BUNDLE
     componentproxymodel.h componentproxymodel.cpp
     proxydelegate.h proxydelegate.cpp
     customrelationalmodel.h customrelationalmodel.cpp
+    customsortfilterproxymodel.h customsortfilterproxymodel.cpp
 
 )
 

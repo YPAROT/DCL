@@ -1,6 +1,9 @@
 #include "filtertableview.h"
 #include "ui_filtertableview.h"
 #include <QScrollBar>
+#include <QSqlRelationalTableModel>
+#include "componenttablemodel.h"
+#include "customrelationalmodel.h"
 
 FilterTableView::FilterTableView(QWidget *parent)
     : QWidget(parent)
@@ -38,21 +41,45 @@ FilterTableView::FilterTableView(QWidget *parent)
     ui->sqlTable->setSortingEnabled(true);
     ui->filterTable->setSortingEnabled(false);
 
-
-    //actions sur la vue
+    //Ajout d'un menu contextuel
     if(ui->sqlTable->editTriggers() != QAbstractItemView::NoEditTriggers)
     {
-        m_insert_row_action = new QAction("Insérer une ligne",ui->sqlTable);
+        ui->sqlTable->setContextMenuPolicy(Qt::ActionsContextMenu);
+
+        QAction* m_insert_row_action = new QAction("Insérer une ligne",ui->sqlTable);
         ui->sqlTable->addAction(m_insert_row_action);
 
-        m_delete_row_action = new QAction("Effacer une ligne insérée",ui->sqlTable);
+        QAction* m_copy_row_action = new QAction("Copier une ligne",ui->sqlTable);
+        ui->sqlTable->addAction(m_copy_row_action);
+
+        QAction* m_paste_row_action = new QAction("Coller une ligne",ui->sqlTable);
+        ui->sqlTable->addAction(m_paste_row_action);
+
+        QAction* m_delete_row_action = new QAction("Effacer une ligne insérée",ui->sqlTable);
         ui->sqlTable->addAction(m_delete_row_action);
 
-        m_commit_action = new QAction("Commit",ui->sqlTable);
+        QAction* m_commit_action = new QAction("Commit",ui->sqlTable);
         ui->sqlTable->addAction(m_commit_action);
 
-        m_refresh_action = new QAction("Recharger la base de donnée",ui->sqlTable);
+        QAction* m_revert_rows_action = new QAction("Annuler les changements sur les lignes sélectionnées",ui->sqlTable);
+        ui->sqlTable->addAction(m_revert_rows_action);
+
+        QAction* m_refresh_action = new QAction("Recharger la base de donnée",ui->sqlTable);
         ui->sqlTable->addAction(m_refresh_action);
+
+        //Connections aux slots
+        connect(m_insert_row_action,&QAction::triggered,this,&FilterTableView::insertRow);
+        connect(m_copy_row_action,&QAction::triggered,this,&FilterTableView::copyRow);
+        connect(m_paste_row_action,&QAction::triggered,this,&FilterTableView::pasteRow);
+        connect(m_delete_row_action,&QAction::triggered,this,&FilterTableView::deleteRow);
+        connect(m_commit_action,&QAction::triggered,this,&FilterTableView::commit);
+        connect(m_revert_rows_action,&QAction::triggered,this,&FilterTableView::revertRows);
+        connect(m_refresh_action,&QAction::triggered,this,&FilterTableView::refresh);
+
+    }
+    else
+    {
+        ui->sqlTable->setContextMenuPolicy(Qt::NoContextMenu);
     }
 
     //connections des signaux
@@ -132,8 +159,6 @@ void FilterTableView::sqlModelChanged(QAbstractItemModel* model)
     }
     ui->filterTable->setHorizontalHeaderLabels(header_labels);
     ui->sqlTable->blockSignals(false);
-    // ui->filterTable->setHorizontalHeader(ui->sqlTable->horizontalHeader());
-    // ui->filterTable->horizontalHeader()->setVisible(true); //Les headers copiés sont setvisible(false)
 
     //ajout des filtres
     ui->filterTable->setRowCount(1);
@@ -153,4 +178,67 @@ void FilterTableView::sqlModelChanged(QAbstractItemModel* model)
 void FilterTableView::filterTableHeaderSectionResized(int logicalIndex, int oldSize, int newSize)
 {
     ui->sqlTable->setColumnWidth(logicalIndex,newSize);
+}
+
+void FilterTableView::insertRow()
+{
+    QSqlRelationalTableModel* model = static_cast<QSqlRelationalTableModel*>(ui->sqlTable->model());
+    model->insertRows(model->rowCount(),1);
+}
+
+void FilterTableView::copyRow()
+{
+
+}
+
+void FilterTableView::pasteRow()
+{
+
+}
+
+void FilterTableView::deleteRow()
+{
+
+}
+
+void FilterTableView::commit()
+{
+
+}
+
+void FilterTableView::revertRows()
+{
+    QSqlRelationalTableModel* model = static_cast<QSqlRelationalTableModel*>(ui->sqlTable->model());
+    QModelIndexList selected_rows = ui->sqlTable->selectionModel()->selectedRows();
+    for(QModelIndex index : std::as_const(selected_rows))
+    {
+        if(index.isValid())
+        {
+            model->revertRow(index.row());
+        }
+    }
+}
+
+void FilterTableView::refresh()
+{
+    //attention au proxy!!!!
+    qDebug() << "Type du modèle : " << ui->sqlTable->model()->metaObject()->className();
+    //La fonction select n'étant pas déclarée virtual dans les classes mères, il faut pointer le bon objet
+
+    ComponentTableModel* model1 = dynamic_cast<ComponentTableModel*>(ui->sqlTable->model());
+    if(model1 != nullptr)
+    {
+        model1->select();
+        return;
+    }
+
+    CustomRelationalModel* model2 = dynamic_cast<CustomRelationalModel*>(ui->sqlTable->model());
+    if(model2 != nullptr)
+    {
+        qDebug()<<"Table correspondante: "<<model2->tableName();
+        model2->select();
+        return;
+    }
+
+    qWarning()<<"Refresh impossible car le modèle ne correspond pas aux casts possibles";
 }

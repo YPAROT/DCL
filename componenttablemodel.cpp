@@ -111,6 +111,21 @@ QVariant ComponentTableModel::headerData(int section, Qt::Orientation orientatio
     return QVariant();
 }
 
+bool ComponentTableModel::insertRows(int row, int count, const QModelIndex &parent)
+{
+    bool success = QSqlRelationalTableModel::insertRows(row,count,parent);
+
+    if(success)
+    {
+        for (int i = 0; i < count; ++i)
+        {
+            m_stock.append(0);
+        }
+    }
+
+    return success;
+}
+
 int ComponentTableModel::calculateUsedQuantity(int composant_id)
 {
     //Création d'une query

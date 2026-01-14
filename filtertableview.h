@@ -34,15 +34,20 @@ protected slots:
     void sqlModelChanged(QAbstractItemModel* model);
     void filterTableHeaderSectionResized(int logicalIndex, int oldSize, int newSize);
 
+public slots:
+    void insertRow();
+    void copyRow();
+    void pasteRow();
+    void deleteRow();
+    void commit();
+    void revertRows();
+    void refresh();
+
 
 private:
     Ui::FilterTableView *ui;
     QList<QLineEdit*> m_filters_edit;
     QTimer* m_filter_refresh_timer;
-    QAction* m_insert_row_action;
-    QAction* m_delete_row_action;
-    QAction* m_commit_action;
-    QAction* m_refresh_action;
 };
 
 #endif // FILTERTABLEVIEW_H
