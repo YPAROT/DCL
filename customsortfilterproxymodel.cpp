@@ -4,6 +4,15 @@ CustomSortFilterProxyModel::CustomSortFilterProxyModel(QObject *parent)
     : QSortFilterProxyModel{parent}
 {}
 
+QModelIndex CustomSortFilterProxyModel::mapToSource(const QModelIndex &proxyIndex) const
+{
+    QModelIndex index = QSortFilterProxyModel::mapToSource(proxyIndex);
+    if(index.column() != proxyIndex.column() && index.isValid() && proxyIndex.isValid())
+        qDebug()<<"La colonne du proxy est différente de la colonne du modèle";
+
+    return index;
+}
+
 void CustomSortFilterProxyModel::setFilters(QStringList filters)
 {
     beginFilterChange();

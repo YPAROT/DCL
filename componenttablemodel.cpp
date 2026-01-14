@@ -40,15 +40,24 @@ bool ComponentTableModel::setData(const QModelIndex &index, const QVariant &valu
 {
     if (!index.isValid()) return false;
 
+    // Gestion de la colonne Qté_commandée (colonne 21)
     if (index.column() == 21) {
         if (value.canConvert<int>()) {
-            int composant_id = QSqlTableModel::data(this->index(index.row(), 0), Qt::EditRole).toInt();
-            m_stock[index.row()] = value.toInt() - calculateUsedQuantity(composant_id);
-            emit dataChanged(index, index); // Rafraîchit uniquement cette cellule
-            return true;
+            // 1. Enregistre la valeur dans la base via la classe parente
+            bool success = QSqlRelationalTableModel::setData(index, value, role);
+            if (success) {
+                // 2. Met à jour m_stock pour la colonne calculée (Qté_restante)
+                int composant_id = QSqlTableModel::data(this->index(index.row(), 0), Qt::EditRole).toInt();
+                m_stock[index.row()] = value.toInt() - calculateUsedQuantity(composant_id);
+                // 3. Rafraîchit la colonne Qté_restante (colonne 21)
+                QModelIndex stockIndex = this->index(index.row(), 21);
+                emit dataChanged(stockIndex, stockIndex);
+            }
+            return success;
         }
         return false;
     }
+
     // Pour les autres colonnes, utilise le comportement par défaut
     return QSqlRelationalTableModel::setData(index, value, role);
 }

@@ -8,6 +8,7 @@ class CustomSortFilterProxyModel : public QSortFilterProxyModel
     Q_OBJECT
 public:
     explicit CustomSortFilterProxyModel(QObject *parent = nullptr);
+    virtual QModelIndex mapToSource(const QModelIndex &proxyIndex) const override;
 
 public slots:
 
