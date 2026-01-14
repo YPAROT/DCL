@@ -2,6 +2,7 @@
 #include <QComboBox>
 #include <QPainter>
 #include <QSqlQuery>
+#include <QSqlDriver>
 #include <QDebug>
 #include <QSqlRelationalTableModel>
 
@@ -12,11 +13,12 @@ ForeignKeyDelegate::ForeignKeyDelegate(
     const QString &keyColumn,
     QSqlDatabase db
     ) : ProxyDelegate(parent),
-    m_foreignTable(foreignTable),
-    m_displayColumn(displayColumn),
-    m_keyColumn(keyColumn),
     m_db(db)
 {
+    //On échappe les caractères qui le demande
+    m_foreignTable = m_db.driver()->escapeIdentifier(foreignTable, QSqlDriver::TableName);
+    m_displayColumn = m_db.driver()->escapeIdentifier(displayColumn, QSqlDriver::FieldName);
+    m_keyColumn = m_db.driver()->escapeIdentifier(keyColumn, QSqlDriver::FieldName);
 }
 
 QWidget *ForeignKeyDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const

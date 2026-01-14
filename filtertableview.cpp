@@ -4,6 +4,7 @@
 #include <QSqlRelationalTableModel>
 #include "componenttablemodel.h"
 #include "customrelationalmodel.h"
+#include "customsortfilterproxymodel.h"
 
 FilterTableView::FilterTableView(QWidget *parent)
     : QWidget(parent)
@@ -182,8 +183,24 @@ void FilterTableView::filterTableHeaderSectionResized(int logicalIndex, int oldS
 
 void FilterTableView::insertRow()
 {
-    QSqlRelationalTableModel* model = static_cast<QSqlRelationalTableModel*>(ui->sqlTable->model());
-    model->insertRows(model->rowCount(),1);
+    //Est-ce un proxy?
+    QAbstractItemModel* model = ui->sqlTable->model();
+    CustomSortFilterProxyModel* proxy = dynamic_cast<CustomSortFilterProxyModel*>(model);
+    if(proxy)
+    {
+        qDebug()<<"Proxy attaché à la vue";
+        model = proxy->sourceModel();
+    }
+
+    //Ajout de la ligne
+    QSqlRelationalTableModel* source_model = static_cast<QSqlRelationalTableModel*>(model);
+    if(!source_model)
+    {
+        qWarning()<<"Cast raté sur le modèle "<<model;
+        return;
+    }
+
+    source_model->insertRows(model->rowCount(),1);
 }
 
 void FilterTableView::copyRow()
@@ -208,31 +225,38 @@ void FilterTableView::commit()
 
 void FilterTableView::revertRows()
 {
-    QSqlRelationalTableModel* model = static_cast<QSqlRelationalTableModel*>(ui->sqlTable->model());
-    QModelIndexList selected_rows = ui->sqlTable->selectionModel()->selectedRows();
-    for(QModelIndex index : std::as_const(selected_rows))
-    {
-        if(index.isValid())
-        {
-            model->revertRow(index.row());
-        }
-    }
+    // QSqlRelationalTableModel* model = static_cast<QSqlRelationalTableModel*>(ui->sqlTable->model());
+    // QModelIndexList selected_rows = ui->sqlTable->selectionModel()->selectedRows();
+    // for(QModelIndex index : std::as_const(selected_rows))
+    // {
+    //     if(index.isValid())
+    //     {
+    //         model->revertRow(index.row());
+    //     }
+    // }
 }
 
 void FilterTableView::refresh()
 {
-    //attention au proxy!!!!
-    qDebug() << "Type du modèle : " << ui->sqlTable->model()->metaObject()->className();
-    //La fonction select n'étant pas déclarée virtual dans les classes mères, il faut pointer le bon objet
+    //Est-ce un proxy?
+    QAbstractItemModel* model = ui->sqlTable->model();
+    CustomSortFilterProxyModel* proxy = dynamic_cast<CustomSortFilterProxyModel*>(model);
+    if(proxy)
+    {
+        qDebug()<<"Proxy attaché à la vue";
+        model = proxy->sourceModel();
+    }
 
-    ComponentTableModel* model1 = dynamic_cast<ComponentTableModel*>(ui->sqlTable->model());
+
+    //La fonction select n'étant pas déclarée virtual dans les classes mères, il faut pointer le bon objet
+    ComponentTableModel* model1 = dynamic_cast<ComponentTableModel*>(model);
     if(model1 != nullptr)
     {
         model1->select();
         return;
     }
 
-    CustomRelationalModel* model2 = dynamic_cast<CustomRelationalModel*>(ui->sqlTable->model());
+    CustomRelationalModel* model2 = dynamic_cast<CustomRelationalModel*>(model);
     if(model2 != nullptr)
     {
         qDebug()<<"Table correspondante: "<<model2->tableName();
