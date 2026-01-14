@@ -7,6 +7,8 @@
 #include "componentproxymodel.h"
 #include "customsortfilterproxymodel.h"
 
+#include <QSqlRelation>
+
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
@@ -94,14 +96,18 @@ void MainWindow::on_actionLoad_DCL_triggered()
     //Connection des filtres au proxy
     connect(ui->vue_edition_composant,&FilterTableView::filtersChanged,proxy,&ComponentProxyModel::setFilters);
     //delegates
-    m_factory->setDelegate("Composants",ui->vue_edition_composant->getTableView()->objectName(),9,new ForeignKeyDelegate(this,"Manufacturer","Name","Manuf_ID",db));
+    m_factory->setRelation("Composants",9,QSqlRelation("Manufacturer","Manuf_ID","Name"));
+    m_factory->setDelegate("Composants",ui->vue_edition_composant->getTableView()->objectName(),9,new ForeignKeyDelegate(this));
     m_factory->setDelegate("Composants",ui->vue_edition_composant->getTableView()->objectName(),13,new OuiNonDelegate(this));
-    m_factory->setDelegate("Composants",ui->vue_edition_composant->getTableView()->objectName(),14,new ForeignKeyDelegate(this,"Procurement Company","Name","Proc_ID",db));
+    m_factory->setRelation("Composants",14,QSqlRelation("\"Procurement Company\"","Proc_ID","Name"));
+    m_factory->setDelegate("Composants",ui->vue_edition_composant->getTableView()->objectName(),14,new ForeignKeyDelegate(this));
     m_factory->setDelegate("Composants",ui->vue_edition_composant->getTableView()->objectName(),15,new OuiNonDelegate(this));
     m_factory->setDelegate("Composants",ui->vue_edition_composant->getTableView()->objectName(),17,new OuiNonDelegate(this));
-    m_factory->setDelegate("Composants",ui->vue_edition_composant->getTableView()->objectName(),19,new ForeignKeyDelegate(this,"Status","Status","ID",db));
+    m_factory->setRelation("Composants",19,QSqlRelation("Status","ID","Status"));
+    m_factory->setDelegate("Composants",ui->vue_edition_composant->getTableView()->objectName(),19,new ForeignKeyDelegate(this));
     m_factory->setDelegate("Composants",ui->vue_edition_composant->getTableView()->objectName(),20,new DateDelegate(this));
-    m_factory->setDelegate("Composants",ui->vue_edition_composant->getTableView()->objectName(),22,new ForeignKeyDelegate(this,"Stockage","Location","ID",db));
+    m_factory->setRelation("Composants",22,QSqlRelation("Stockage","ID","Location"));
+    m_factory->setDelegate("Composants",ui->vue_edition_composant->getTableView()->objectName(),22,new ForeignKeyDelegate(this));
     //Vue normale
     m_factory->attachView("Composants",ui->dclCompleteSqlTableWidget->getTableView());
     proxy = new ComponentProxyModel();
@@ -109,14 +115,14 @@ void MainWindow::on_actionLoad_DCL_triggered()
     //Connection des filtres au proxy
     connect(ui->dclCompleteSqlTableWidget,&FilterTableView::filtersChanged,proxy,&ComponentProxyModel::setFilters);
     //delegates
-    m_factory->setDelegate("Composants",ui->dclCompleteSqlTableWidget->getTableView()->objectName(),9,new ForeignKeyDelegate(this,"Manufacturer","Name","Manuf_ID",db));
+    //m_factory->setDelegate("Composants",ui->dclCompleteSqlTableWidget->getTableView()->objectName(),9,new ForeignKeyDelegate(this,"Manufacturer","Name","Manuf_ID",db));
     m_factory->setDelegate("Composants",ui->dclCompleteSqlTableWidget->getTableView()->objectName(),13,new OuiNonDelegate(this));
-    m_factory->setDelegate("Composants",ui->dclCompleteSqlTableWidget->getTableView()->objectName(),14,new ForeignKeyDelegate(this,"Procurement Company","Name","Proc_ID",db));
+    //m_factory->setDelegate("Composants",ui->dclCompleteSqlTableWidget->getTableView()->objectName(),14,new ForeignKeyDelegate(this,"Procurement Company","Name","Proc_ID",db));
     m_factory->setDelegate("Composants",ui->dclCompleteSqlTableWidget->getTableView()->objectName(),15,new OuiNonDelegate(this));
     m_factory->setDelegate("Composants",ui->dclCompleteSqlTableWidget->getTableView()->objectName(),17,new OuiNonDelegate(this));
-    m_factory->setDelegate("Composants",ui->dclCompleteSqlTableWidget->getTableView()->objectName(),19,new ForeignKeyDelegate(this,"Status","Status","ID",db));
+    //m_factory->setDelegate("Composants",ui->dclCompleteSqlTableWidget->getTableView()->objectName(),19,new ForeignKeyDelegate(this,"Status","Status","ID",db));
     m_factory->setDelegate("Composants",ui->dclCompleteSqlTableWidget->getTableView()->objectName(),20,new DateDelegate(this));
-    m_factory->setDelegate("Composants",ui->dclCompleteSqlTableWidget->getTableView()->objectName(),22,new ForeignKeyDelegate(this,"Stockage","Location","ID",db));
+    //m_factory->setDelegate("Composants",ui->dclCompleteSqlTableWidget->getTableView()->objectName(),22,new ForeignKeyDelegate(this,"Stockage","Location","ID",db));
 
     //-> Table carte
     m_factory->createModel("Board",db);
@@ -145,7 +151,7 @@ void MainWindow::on_actionLoad_DCL_triggered()
     //Connection des filtres au proxy
     connect(ui->editContactSqlTableWidget,&FilterTableView::filtersChanged,proxy,&CustomSortFilterProxyModel::setFilters);
     //delegates
-    m_factory->setDelegate("Procurement Company Contact",ui->editContactSqlTableWidget->getTableView()->objectName(),5,new ForeignKeyDelegate(this,"Procurement Company","Name","Proc_ID",db));
+    //m_factory->setDelegate("Procurement Company Contact",ui->editContactSqlTableWidget->getTableView()->objectName(),5,new ForeignKeyDelegate(this,"Procurement Company","Name","Proc_ID",db));
 
     //-> Table Fabricants
     m_factory->createModel("Manufacturer",db);

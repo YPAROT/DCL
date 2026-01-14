@@ -28,7 +28,7 @@ bool CustomSortFilterProxyModel::filterAcceptsRow(int source_row, const QModelIn
         if (m_filters[i].isEmpty()) continue;  // Ignorer les filtres vides
 
         QModelIndex index = sourceModel()->index(source_row, i, source_parent);
-        QString data = sourceModel()->data(index).toString();
+        QString data = sourceModel()->data(index,Qt::DisplayRole).toString();
 
         if (!data.contains(m_filters[i], Qt::CaseInsensitive)) {
             return false;  // La ligne ne correspond pas à ce filtre

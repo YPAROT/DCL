@@ -7,18 +7,8 @@
 #include <QSqlRelationalTableModel>
 
 ForeignKeyDelegate::ForeignKeyDelegate(
-    QObject *parent,
-    const QString &foreignTable,
-    const QString &displayColumn,
-    const QString &keyColumn,
-    QSqlDatabase db
-    ) : ProxyDelegate(parent),
-    m_db(db)
+    QObject *parent) : ProxyDelegate(parent)
 {
-    //On échappe les caractères qui le demande
-    m_foreignTable = m_db.driver()->escapeIdentifier(foreignTable, QSqlDriver::TableName);
-    m_displayColumn = m_db.driver()->escapeIdentifier(displayColumn, QSqlDriver::FieldName);
-    m_keyColumn = m_db.driver()->escapeIdentifier(keyColumn, QSqlDriver::FieldName);
 }
 
 QWidget *ForeignKeyDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const
@@ -27,63 +17,88 @@ QWidget *ForeignKeyDelegate::createEditor(QWidget *parent, const QStyleOptionVie
     editor->setEditable(false); // Désactive l'édition directe
 
     // Remplit le QComboBox avec les données de la table étrangère
-    QSqlQuery query(m_db);
-    query.exec(QString("SELECT %1, %2 FROM %3").arg(m_keyColumn, m_displayColumn, m_foreignTable));
-    while (query.next()) {
-        editor->addItem(query.value(1).toString(), query.value(0));
-    }
+    //récupération du modèle
+    const QSqlRelationalTableModel* model = m_proxy ? dynamic_cast<const QSqlRelationalTableModel*>(m_proxy->sourceModel()) : dynamic_cast<const QSqlRelationalTableModel*>(index.model());
+    //récupération de la table étrnagère
+    QSqlTableModel *foreign_model = model ? model->relationModel(index.column()) : nullptr;
+    //si elle n'existe pas on retourne un éditeur gérant le proxy simplement
+    if(!foreign_model) return ProxyDelegate::createEditor(parent,option,index);
+    editor->setModel(foreign_model);
+    //récupération de la colonne à afficher grâce au modele
+    const QString display_column_name = model->relation(index.column()).displayColumn();
+    //Vérification du codage par le driver
+    const QSqlDriver *driver = foreign_model->database().driver(); //pour bien faire se fait sur la table foreign mais elle utilise normalement le même driver que la table qui la référence
+    const QString display_column_encoded = driver->isIdentifierEscaped(display_column_name,QSqlDriver::FieldName) ? driver->stripDelimiters(display_column_name,QSqlDriver::FieldName):display_column_name;
+
+    editor->setModelColumn(foreign_model->fieldIndex(display_column_encoded));
 
     return editor;
 }
 
 void ForeignKeyDelegate::setEditorData(QWidget *editor, const QModelIndex &index) const
 {
-    QComboBox *comboBox = qobject_cast<QComboBox *>(editor);
-    if (!comboBox) return;
+    if(!index.isValid()) return;
 
-    //On récupère le bon index si il y a un proxy
+    QComboBox *comboBox = qobject_cast<QComboBox *>(editor);
+    if (!comboBox) return ProxyDelegate::setEditorData(editor,index);
+
+    //gestion du proxy
     QModelIndex source_index = m_proxy ? m_proxy->mapToSource(index) : index;
-    // Récupère la valeur actuelle de l'index
-    QVariant currentId = source_index.data(Qt::EditRole);
-    // Récupère le nom actuel
-    QSqlQuery query(m_db);
-    query.prepare(QString("SELECT %1 FROM %2 WHERE %3 = ?").arg(m_displayColumn, m_foreignTable, m_keyColumn));
-    query.addBindValue(currentId);
-    query.exec();
-    if (query.next()) {
-        comboBox->setCurrentText(query.value(0).toString());
+
+    QVariant value = source_index.data(Qt::DisplayRole);//Le display donne accès au nom dans la table lié et non à l'index comme l'editrole
+
+    //récupération du type (copié de la façon de faire dans QsqlRelationalDelegate. Faire plus simple?)
+    const QByteArray editor_property_name = editor->metaObject()->userProperty().name();
+    if (!editor_property_name.isEmpty()) {
+        if (!value.isValid())
+            value = QVariant(editor->property(editor_property_name.data()).userType());
+        editor->setProperty(editor_property_name.data(), value);
+        return;
     }
+
 }
 
 void ForeignKeyDelegate::setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const
 {
+    if(!index.isValid()) return;
+
+    //Récupération du modele
+    QSqlRelationalTableModel* source_model = m_proxy ? dynamic_cast<QSqlRelationalTableModel*>(m_proxy->sourceModel()) : dynamic_cast<QSqlRelationalTableModel*>(model);
+    //récupération de la table étrangère
+    QSqlTableModel *foreign_model = source_model ? source_model->relationModel(index.column()) : nullptr;
     QComboBox *comboBox = qobject_cast<QComboBox *>(editor);
-    if (!comboBox) return;
+    if (!source_model || !foreign_model || !comboBox) {
+        ProxyDelegate::setModelData(editor, model, index);
+        return;
+    }
+    //Récupération du driver
+    const QSqlDriver *const driver = foreign_model->database().driver();
 
     //On récupère le bon index si il y a un proxy
-    //QModelIndex source_index = m_proxy ? m_proxy->mapToSource(index) : index;
+    QModelIndex source_index = m_proxy ? m_proxy->mapToSource(index) : index;
+    if(!source_index.isValid()) return;
 
-    // Récupère l'ID sélectionné
-    int foreignKey = comboBox->currentData().toInt();
-    // Met à jour le modèle avec la nouvelle valeur
-    model->setData(index, foreignKey, Qt::EditRole);
+    int currentItem = comboBox->currentIndex();
+
+    //recherche de l'index et du nom dans la table étrangère
+    const QString display_column_name = source_model->relation(source_index.column()).displayColumn();
+    const QString index_column_name = source_model->relation(source_index.column()).indexColumn();
+
+    const QString display_column_encoded = driver->isIdentifierEscaped(display_column_name,QSqlDriver::FieldName) ? driver->stripDelimiters(display_column_name,QSqlDriver::FieldName):display_column_name;
+    const QString index_column_encoded = driver->isIdentifierEscaped(index_column_name,QSqlDriver::FieldName) ? driver->stripDelimiters(index_column_name,QSqlDriver::FieldName):index_column_name;
+
+    //Display
+    source_model->setData(source_index,foreign_model->data(foreign_model->index(currentItem,foreign_model->fieldIndex(display_column_encoded))),Qt::DisplayRole);
+    //Edit
+    source_model->setData(source_index,foreign_model->data(foreign_model->index(currentItem,foreign_model->fieldIndex(index_column_encoded))),Qt::EditRole);
+
 }
 
 void ForeignKeyDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
     //On récupère le bon index si il y a un proxy
     QModelIndex source_index = m_proxy ? m_proxy->mapToSource(index) : index;
-    // Récupère la valeur actuelle de l'index
-    QVariant currentId = source_index.data(Qt::EditRole);
-    // Récupère le nom à afficher
-    QSqlQuery query(m_db);
-    query.prepare(QString("SELECT %1 FROM %2 WHERE %3 = ?").arg(m_displayColumn, m_foreignTable, m_keyColumn));
-    query.addBindValue(currentId);
-    query.exec();
-    QString displayText;
-    if (query.next()) {
-        displayText = query.value(0).toString();
-    }
+    QVariant displayText = source_index.data(Qt::DisplayRole);
 
     // Gestion des options de dessin
     QStyleOptionViewItem opt = option;
@@ -97,7 +112,7 @@ void ForeignKeyDelegate::paint(QPainter *painter, const QStyleOptionViewItem &op
     }
 
     // Dessine le texte
-    painter->drawText(opt.rect, displayText,opt.displayAlignment);
+    painter->drawText(opt.rect, displayText.toString(),opt.displayAlignment);
 }
 
 

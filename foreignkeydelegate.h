@@ -7,14 +7,9 @@
 class ForeignKeyDelegate : public ProxyDelegate
 {
     Q_OBJECT
+
 public:
-    explicit ForeignKeyDelegate(
-        QObject *parent = nullptr,
-        const QString &foreignTable = "",
-        const QString &displayColumn = "",
-        const QString &keyColumn = "",
-        QSqlDatabase db = QSqlDatabase()
-        );
+    explicit ForeignKeyDelegate(QObject *parent = nullptr);
 
     QWidget *createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
     void setEditorData(QWidget *editor, const QModelIndex &index) const override;
@@ -22,11 +17,6 @@ public:
     void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
 
 
-private:
-    QString m_foreignTable;
-    QString m_displayColumn;
-    QString m_keyColumn;
-    QSqlDatabase m_db;
 };
 
 #endif // FOREIGNKEYDELEGATE_H
